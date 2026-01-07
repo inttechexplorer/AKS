@@ -1,0 +1,236 @@
+<section>
+  <h1 style="color:#f5c84c;">Python for Kubernetes & AKS</h1>
+
+  <p>
+    Beyond scripting and CI/CD, Python integrates directly with Kubernetes
+    and Azure Kubernetes Service (AKS) using official SDKs and APIs.
+    This enables programmatic cluster management, automation, and tooling.
+  </p>
+
+  <hr />
+
+  <h2>1️⃣ Why Use Python with Kubernetes?</h2>
+
+  <ul>
+    <li>Automate cluster operations</li>
+    <li>Build custom DevOps tools</li>
+    <li>Query and modify Kubernetes resources</li>
+    <li>Integrate Kubernetes into internal platforms</li>
+  </ul>
+
+  <p>
+    Python is commonly used when:
+  </p>
+
+  <ul>
+    <li><code>kubectl</code> is not enough</li>
+    <li>Complex logic is required</li>
+    <li>Automation must integrate with other systems</li>
+  </ul>
+
+  <hr />
+
+  <h2>2️⃣ Kubernetes Python Client</h2>
+
+  <p>
+    Kubernetes provides an official Python client that talks directly
+    to the Kubernetes API server.
+  </p>
+
+  <pre>
+pip install kubernetes
+  </pre>
+
+  <p>
+    This client uses the same authentication and authorization
+    as <code>kubectl</code>.
+  </p>
+
+  <hr />
+
+  <h2>3️⃣ Authentication & kubeconfig</h2>
+
+  <pre>
+from kubernetes import config
+
+config.load_kube_config()
+  </pre>
+
+  <p>
+    This loads credentials from:
+  </p>
+
+  <ul>
+    <li><code>~/.kube/config</code></li>
+    <li>AKS credentials retrieved via Azure CLI</li>
+  </ul>
+
+  <hr />
+
+  <h2>4️⃣ Listing Pods with Python</h2>
+
+  <pre>
+from kubernetes import client, config
+
+config.load_kube_config()
+v1 = client.CoreV1Api()
+
+pods = v1.list_namespaced_pod(namespace="default")
+for pod in pods.items:
+    print(pod.metadata.name)
+  </pre>
+
+  <p>
+    This script does exactly what <code>kubectl get pods</code> does,
+    but programmatically.
+  </p>
+
+  <hr />
+
+  <h2>5️⃣ Creating Kubernetes Resources</h2>
+
+  <pre>
+deployment = {
+  "apiVersion": "apps/v1",
+  "kind": "Deployment",
+  "metadata": {"name": "python-app"},
+  "spec": {
+    "replicas": 2,
+    "selector": {"matchLabels": {"app": "python"}},
+    "template": {
+      "metadata": {"labels": {"app": "python"}},
+      "spec": {
+        "containers": [
+          {
+            "name": "app",
+            "image": "nginx"
+          }
+        ]
+      }
+    }
+  }
+}
+  </pre>
+
+  <p>
+    This dictionary can be submitted directly to the Kubernetes API.
+  </p>
+
+  <hr />
+
+  <h2>6️⃣ Watching Cluster Events</h2>
+
+  <pre>
+from kubernetes import watch
+
+w = watch.Watch()
+for event in w.stream(v1.list_namespaced_pod, namespace="default"):
+    print(event["type"], event["object"].metadata.name)
+  </pre>
+
+  <p>
+    Watching resources is useful for:
+  </p>
+
+  <ul>
+    <li>Monitoring deployments</li>
+    <li>Triggering alerts</li>
+    <li>Building operators</li>
+  </ul>
+
+  <hr />
+
+  <h2>7️⃣ Python with AKS (Azure Integration)</h2>
+
+  <p>
+    Python also integrates with Azure using the Azure SDK.
+  </p>
+
+  <pre>
+pip install azure-identity azure-mgmt-containerservice
+  </pre>
+
+  <pre>
+from azure.identity import DefaultAzureCredential
+from azure.mgmt.containerservice import ContainerServiceClient
+
+credential = DefaultAzureCredential()
+client = ContainerServiceClient(credential, "SUBSCRIPTION_ID")
+  </pre>
+
+  <p>
+    This allows you to:
+  </p>
+
+  <ul>
+    <li>Create AKS clusters</li>
+    <li>Scale node pools</li>
+    <li>Query cluster status</li>
+  </ul>
+
+  <hr />
+
+  <h2>8️⃣ Scaling AKS Node Pools with Python</h2>
+
+  <pre>
+client.agent_pools.begin_create_or_update(
+  resource_group_name="rg-aks",
+  resource_name="aks-cluster",
+  agent_pool_name="nodepool1",
+  parameters={
+    "count": 5,
+    "vm_size": "Standard_DS2_v2"
+  }
+)
+  </pre>
+
+  <p>
+    This is equivalent to scaling via Azure Portal or CLI,
+    but fully automated.
+  </p>
+
+  <hr />
+
+  <h2>9️⃣ Real-Life Use Case</h2>
+
+  <p>
+    A platform team builds an internal dashboard that:
+  </p>
+
+  <ul>
+    <li>Lists all Pods across namespaces</li>
+    <li>Detects crash loops</li>
+    <li>Scales AKS node pools automatically</li>
+    <li>Triggers alerts</li>
+  </ul>
+
+  <p>
+    Python is the glue connecting Kubernetes, Azure, and monitoring tools.
+  </p>
+
+  <hr />
+
+  <h2>🔍 Interview Self-Check</h2>
+
+  <p><b>Q:</b> When should you use the Kubernetes Python client?</p>
+  <p><b>A:</b> When automation requires logic beyond kubectl.</p>
+
+  <p><b>Q:</b> How does Python authenticate to AKS?</p>
+  <p><b>A:</b> kubeconfig or managed identities.</p>
+
+  <p><b>Q:</b> Can Python replace kubectl?</p>
+  <p><b>A:</b> For automation and tooling, yes.</p>
+
+  <hr />
+
+  <h2>➡️ What Comes Next?</h2>
+
+  <p>
+    Managing raw YAML and Kubernetes objects can become complex.
+    Next, we learn how Helm simplifies this.
+  </p>
+
+  <p style="color:#4da3ff;">
+    👉 Proceed to <b>Helm Charts (From Zero to Production)</b>
+  </p>
+</section>

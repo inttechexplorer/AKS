@@ -1,0 +1,289 @@
+<section>
+  <h1 style="color:#f5c84c;">AKS Architecture, Networking & Security (Deep Dive)</h1>
+
+  <p>
+    Azure Kubernetes Service (AKS) is not just “Kubernetes on Azure”.
+    It is a deeply integrated platform combining Kubernetes primitives
+    with Azure networking, identity, security, and governance.
+  </p>
+
+  <hr />
+
+  <h2>1️⃣ AKS High-Level Architecture</h2>
+
+  <p>
+    An AKS cluster is divided into two logical planes:
+  </p>
+
+  <ul>
+    <li><b>Control Plane</b> – Managed entirely by Azure</li>
+    <li><b>Node Plane</b> – Customer-managed worker nodes</li>
+  </ul>
+
+  <pre>
+Azure Subscription
+ ├── Managed Control Plane (API Server, etcd, Scheduler)
+ └── Node Resource Group
+      ├── VM Scale Sets (Worker Nodes)
+      ├── Virtual Network
+      ├── Load Balancers
+      └── Managed Disks
+  </pre>
+
+  <p>
+    You never see or manage the control plane VMs.
+    Azure patches, upgrades, and secures them automatically.
+  </p>
+
+  <hr />
+
+  <h2>2️⃣ Control Plane Components (Conceptual)</h2>
+
+  <ul>
+    <li><b>API Server</b> – Entry point for all requests</li>
+    <li><b>etcd</b> – Distributed key-value store (cluster state)</li>
+    <li><b>Scheduler</b> – Decides where Pods run</li>
+    <li><b>Controller Manager</b> – Enforces desired state</li>
+  </ul>
+
+  <p>
+    Every <code>kubectl</code>, Helm, CI/CD, or Python action
+    ultimately talks to the API Server.
+  </p>
+
+  <hr />
+
+  <h2>3️⃣ Node Architecture (Worker Plane)</h2>
+
+  <p>
+    Worker nodes are Azure VMs running:
+  </p>
+
+  <ul>
+    <li>kubelet</li>
+    <li>kube-proxy</li>
+    <li>container runtime (containerd)</li>
+  </ul>
+
+  <p>
+    Nodes are grouped into <b>node pools</b>.
+    Each node pool maps to a VM Scale Set.
+  </p>
+
+  <pre>
+Node Pool
+ ├── VM 1 → Pods
+ ├── VM 2 → Pods
+ └── VM 3 → Pods
+  </pre>
+
+  <hr />
+
+  <h2>4️⃣ AKS Networking Models</h2>
+
+  <p>
+    AKS supports two main networking models:
+  </p>
+
+  <ul>
+    <li><b>Kubenet</b> – Simple, limited IP usage</li>
+    <li><b>Azure CNI</b> – Full Azure VNet integration</li>
+  </ul>
+
+  <hr />
+
+  <h3>🔹 Kubenet</h3>
+
+  <p>
+    Pods get IPs from an internal overlay network.
+    NAT is used for outbound traffic.
+  </p>
+
+  <ul>
+    <li>Lower IP consumption</li>
+    <li>Simpler setup</li>
+    <li>Limited enterprise networking</li>
+  </ul>
+
+  <hr />
+
+  <h3>🔹 Azure CNI (Enterprise Standard)</h3>
+
+  <p>
+    Each Pod gets an IP directly from the Azure VNet.
+  </p>
+
+  <pre>
+VNet
+ ├── Subnet
+ │    ├── Node IP
+ │    ├── Pod IP
+ │    ├── Pod IP
+ │    └── Pod IP
+  </pre>
+
+  <ul>
+    <li>Full VNet visibility</li>
+    <li>NSGs apply to Pods</li>
+    <li>Required for enterprise scenarios</li>
+  </ul>
+
+  <hr />
+
+  <h2>5️⃣ AKS Ingress & Traffic Flow</h2>
+
+  <p>
+    Traffic flow in AKS typically follows:
+  </p>
+
+  <pre>
+Internet
+  ↓
+Azure Load Balancer
+  ↓
+Ingress Controller
+  ↓
+Service
+  ↓
+Pod
+  </pre>
+
+  <p>
+    Common ingress controllers:
+  </p>
+
+  <ul>
+    <li>Nginx Ingress</li>
+    <li>Application Gateway Ingress Controller (AGIC)</li>
+  </ul>
+
+  <hr />
+
+  <h2>6️⃣ Identity & Authentication (Critical)</h2>
+
+  <p>
+    AKS uses <b>Azure Entra ID</b> (Azure AD) for authentication.
+  </p>
+
+  <ul>
+    <li>Users authenticate via Azure</li>
+    <li>Kubernetes RBAC authorizes actions</li>
+    <li>Azure RBAC controls cluster-level access</li>
+  </ul>
+
+  <pre>
+User → Azure AD → AKS API Server → RBAC Decision
+  </pre>
+
+  <hr />
+
+  <h2>7️⃣ Managed Identities</h2>
+
+  <p>
+    AKS uses Managed Identities to securely access Azure resources.
+  </p>
+
+  <ul>
+    <li>No secrets stored in Pods</li>
+    <li>Automatic credential rotation</li>
+    <li>Azure-native security</li>
+  </ul>
+
+  <p>
+    Example use cases:
+  </p>
+
+  <ul>
+    <li>Pull images from ACR</li>
+    <li>Access Azure Key Vault</li>
+    <li>Write logs to Azure Monitor</li>
+  </ul>
+
+  <hr />
+
+  <h2>8️⃣ Network Policies</h2>
+
+  <p>
+    Network Policies control Pod-to-Pod traffic.
+  </p>
+
+  <pre>
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-all
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+  </pre>
+
+  <p>
+    This enforces zero-trust networking inside the cluster.
+  </p>
+
+  <hr />
+
+  <h2>9️⃣ Secrets & Configuration Security</h2>
+
+  <p>
+    Best practices:
+  </p>
+
+  <ul>
+    <li>Never store secrets in YAML</li>
+    <li>Use Azure Key Vault</li>
+    <li>Mount secrets dynamically</li>
+  </ul>
+
+  <p>
+    AKS integrates natively with Key Vault via CSI drivers.
+  </p>
+
+  <hr />
+
+  <h2>🔟 Real-Life Enterprise Architecture</h2>
+
+  <p>
+    A financial platform uses AKS with:
+  </p>
+
+  <ul>
+    <li>Private cluster (no public API)</li>
+    <li>Azure CNI</li>
+    <li>Application Gateway ingress</li>
+    <li>RBAC + Azure AD</li>
+    <li>Network policies enforced</li>
+  </ul>
+
+  <p>
+    This architecture passes strict compliance audits.
+  </p>
+
+  <hr />
+
+  <h2>🔍 Interview Self-Check</h2>
+
+  <p><b>Q:</b> Who manages the AKS control plane?</p>
+  <p><b>A:</b> Azure.</p>
+
+  <p><b>Q:</b> When should Azure CNI be used?</p>
+  <p><b>A:</b> Enterprise networking and security.</p>
+
+  <p><b>Q:</b> How does AKS avoid storing secrets?</p>
+  <p><b>A:</b> Managed Identities and Key Vault.</p>
+
+  <hr />
+
+  <h2>➡️ What Comes Next?</h2>
+
+  <p>
+    Architecture alone is not enough.
+    Next, we must observe, monitor, and troubleshoot AKS in production.
+  </p>
+
+  <p style="color:#4da3ff;">
+    👉 Proceed to <b>AKS Observability & Troubleshooting</b>
+  </p>
+</section>

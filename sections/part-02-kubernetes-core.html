@@ -1,0 +1,225 @@
+<section>
+  <h1 style="color:#f5c84c;">Kubernetes Core Concepts</h1>
+
+  <p>
+    Kubernetes (often called <b>K8s</b>) is a container orchestration system.
+    It does not run applications directly — it manages containers that run applications.
+  </p>
+
+  <hr />
+
+  <h2>1️⃣ Why Kubernetes Exists</h2>
+
+  <p>
+    Before Kubernetes, teams manually managed:
+  </p>
+
+  <ul>
+    <li>Server provisioning</li>
+    <li>Application restarts</li>
+    <li>Scaling during traffic spikes</li>
+    <li>Load balancing</li>
+  </ul>
+
+  <p>
+    Kubernetes automates all of this by enforcing a concept called
+    <b>Desired State</b>.
+  </p>
+
+  <hr />
+
+  <h2>2️⃣ Kubernetes Cluster – High-Level View</h2>
+
+  <pre>
+User / CI-CD
+     │
+     ▼
+Kubernetes API Server
+     │
+     ▼
+Control Plane
+ ├── Scheduler
+ ├── Controller Manager
+ └── etcd (cluster state)
+     │
+     ▼
+Worker Nodes
+ ├── Pod
+ ├── Pod
+ └── Pod
+  </pre>
+
+  <p>
+    Kubernetes is <b>API-driven</b>. Everything is created by talking to the API server.
+  </p>
+
+  <hr />
+
+  <h2>3️⃣ Control Plane Components (Brain of Kubernetes)</h2>
+
+  <ul>
+    <li><b>API Server</b> – Entry point for all commands</li>
+    <li><b>etcd</b> – Distributed key-value store (cluster memory)</li>
+    <li><b>Scheduler</b> – Decides where Pods run</li>
+    <li><b>Controller Manager</b> – Keeps desired state</li>
+  </ul>
+
+  <p>
+    You never SSH into the control plane. You interact only through the API.
+  </p>
+
+  <hr />
+
+  <h2>4️⃣ Worker Nodes (Execution Layer)</h2>
+
+  <pre>
+Worker Node
+ ├── kubelet
+ ├── container runtime (containerd)
+ ├── kube-proxy
+ └── Pods
+  </pre>
+
+  <ul>
+    <li><b>kubelet</b> – Talks to API server</li>
+    <li><b>container runtime</b> – Runs containers</li>
+    <li><b>kube-proxy</b> – Networking rules</li>
+  </ul>
+
+  <hr />
+
+  <h2>5️⃣ Pods – Smallest Unit in Kubernetes</h2>
+
+  <p>
+    A <b>Pod</b> is NOT a container.
+    A Pod is a wrapper around one or more containers.
+  </p>
+
+  <pre>
+Pod
+ ├── Container (App)
+ ├── Container (Sidecar)
+ └── Shared Network + Storage
+  </pre>
+
+  <ul>
+    <li>Pods are ephemeral</li>
+    <li>Pods get recreated, not repaired</li>
+    <li>IP address changes when Pod changes</li>
+  </ul>
+
+  <hr />
+
+  <h2>6️⃣ Deployments – Desired State Engine</h2>
+
+  <p>
+    You never create Pods directly in production.
+    You create a <b>Deployment</b>.
+  </p>
+
+  <pre>
+Deployment
+ └── ReplicaSet
+      └── Pods (replicas)
+  </pre>
+
+  <p>
+    Example desired state:
+  </p>
+
+  <pre>
+replicas: 3
+image: nginx:latest
+  </pre>
+
+  <p>
+    If one Pod dies, Kubernetes creates another automatically.
+  </p>
+
+  <hr />
+
+  <h2>7️⃣ Services – Stable Networking</h2>
+
+  <p>
+    Pods are temporary. Services provide stable access.
+  </p>
+
+  <pre>
+Service
+ ├── Pod A
+ ├── Pod B
+ └── Pod C
+  </pre>
+
+  <ul>
+    <li>ClusterIP – Internal access</li>
+    <li>NodePort – Exposes on node</li>
+    <li>LoadBalancer – Cloud load balancer</li>
+  </ul>
+
+  <hr />
+
+  <h2>8️⃣ Desired State in Action (Key Concept)</h2>
+
+  <p>
+    You tell Kubernetes <b>what you want</b>, not <b>how to do it</b>.
+  </p>
+
+  <pre>
+Desired: 3 replicas
+Actual: 2 replicas
+
+Controller detects difference
+→ Creates 1 Pod
+→ Desired state restored
+  </pre>
+
+  <p>
+    This reconciliation loop runs continuously.
+  </p>
+
+  <hr />
+
+  <h2>9️⃣ Real-Life Scenario</h2>
+
+  <p>
+    You deploy a payment service.
+  </p>
+
+  <ul>
+    <li>Traffic spikes during checkout</li>
+    <li>One Pod crashes</li>
+    <li>Kubernetes replaces it automatically</li>
+    <li>No downtime</li>
+  </ul>
+
+  <p>
+    This is why Kubernetes is used at scale.
+  </p>
+
+  <hr />
+
+  <h2>🔍 Interview Self-Check</h2>
+
+  <p><b>Q:</b> What is Kubernetes?</p>
+  <p><b>A:</b> A container orchestration platform.</p>
+
+  <p><b>Q:</b> What is a Pod?</p>
+  <p><b>A:</b> Smallest deployable unit, wraps containers.</p>
+
+  <p><b>Q:</b> Why Deployments?</p>
+  <p><b>A:</b> To maintain desired state.</p>
+
+  <hr />
+
+  <h2>➡️ What Comes Next?</h2>
+
+  <p>
+    Kubernetes core explains <b>what runs</b>.
+    Next, we learn <b>how traffic flows</b>.
+  </p>
+
+  <p style="color:#4da3ff;">
+    👉 Proceed to <b>Kubernetes Networking</b>
+  </p>
+</section>

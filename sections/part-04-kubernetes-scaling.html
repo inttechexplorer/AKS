@@ -1,0 +1,238 @@
+<section>
+  <h1 style="color:#f5c84c;">Kubernetes Scaling (From Zero to Auto-Healing Systems)</h1>
+
+  <p>
+    Scaling is one of Kubernetes’ most powerful capabilities.
+    It allows applications to automatically adapt to traffic,
+    failures, and resource pressure without human intervention.
+  </p>
+
+  <hr />
+
+  <h2>1️⃣ What Does “Scaling” Mean in Kubernetes?</h2>
+
+  <p>
+    Scaling answers three fundamental questions:
+  </p>
+
+  <ul>
+    <li>How many Pods should be running?</li>
+    <li>How many nodes are required?</li>
+    <li>When should scaling happen automatically?</li>
+  </ul>
+
+  <p>
+    Kubernetes supports scaling at multiple layers:
+    <b>Pod level</b>, <b>Deployment level</b>, and <b>Cluster level</b>.
+  </p>
+
+  <hr />
+
+  <h2>2️⃣ Manual Scaling (The Simplest Form)</h2>
+
+  <p>
+    Manual scaling directly adjusts the number of replicas.
+    This is useful for testing and emergency situations.
+  </p>
+
+  <pre>
+kubectl scale deployment web-app --replicas=5
+  </pre>
+
+  <p>
+    Kubernetes immediately schedules additional Pods
+    until the desired state is reached.
+  </p>
+
+  <hr />
+
+  <h2>3️⃣ Horizontal Pod Autoscaler (HPA)</h2>
+
+  <p>
+    <b>HPA</b> automatically adjusts the number of Pods
+    based on metrics such as CPU or memory usage.
+  </p>
+
+  <pre>
+User Traffic ↑
+   │
+   ▼
+CPU Usage ↑
+   │
+   ▼
+HPA increases replicas
+  </pre>
+
+  <h3>HPA YAML Example</h3>
+
+  <pre>
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: web-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: web-app
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 60
+  </pre>
+
+  <p>
+    If average CPU exceeds 60%, Kubernetes adds Pods.
+    If usage drops, Pods are removed gradually.
+  </p>
+
+  <hr />
+
+  <h2>4️⃣ Metrics Server (Critical Dependency)</h2>
+
+  <p>
+    HPA relies on real-time metrics.
+    These are provided by the <b>metrics-server</b>.
+  </p>
+
+  <pre>
+kubectl top pods
+kubectl top nodes
+  </pre>
+
+  <p>
+    Without metrics-server, HPA cannot function.
+  </p>
+
+  <hr />
+
+  <h2>5️⃣ Vertical Pod Autoscaler (VPA)</h2>
+
+  <p>
+    <b>VPA</b> adjusts CPU and memory requests/limits
+    instead of replica count.
+  </p>
+
+  <pre>
+Pod requests too little memory
+   │
+   ▼
+OOMKills occur
+   │
+   ▼
+VPA recommends higher memory
+  </pre>
+
+  <p>
+    VPA is ideal for:
+  </p>
+
+  <ul>
+    <li>Stateful workloads</li>
+    <li>Memory-sensitive applications</li>
+    <li>Cost optimization</li>
+  </ul>
+
+  <p>
+    ⚠️ HPA and VPA should not modify the same resource simultaneously.
+  </p>
+
+  <hr />
+
+  <h2>6️⃣ Cluster Autoscaler (Node Scaling)</h2>
+
+  <p>
+    When Pods cannot be scheduled due to insufficient resources,
+    <b>Cluster Autoscaler</b> adds nodes automatically.
+  </p>
+
+  <pre>
+Pods Pending
+   │
+   ▼
+No CPU / Memory available
+   │
+   ▼
+New Node added
+   │
+   ▼
+Pods Scheduled
+  </pre>
+
+  <p>
+    In AKS, Cluster Autoscaler integrates directly with Azure VM Scale Sets.
+  </p>
+
+  <hr />
+
+  <h2>7️⃣ Scaling in AKS (Real-World Flow)</h2>
+
+  <pre>
+Traffic Spike
+ │
+ ▼
+HPA adds Pods
+ │
+ ▼
+Node capacity exhausted
+ │
+ ▼
+Cluster Autoscaler adds nodes
+ │
+ ▼
+Stable system restored
+  </pre>
+
+  <p>
+    This multi-layer scaling ensures:
+  </p>
+
+  <ul>
+    <li>High availability</li>
+    <li>Cost efficiency</li>
+    <li>Automatic recovery</li>
+  </ul>
+
+  <hr />
+
+  <h2>8️⃣ Scaling Best Practices</h2>
+
+  <ul>
+    <li>Always define resource requests and limits</li>
+    <li>Use HPA for stateless apps</li>
+    <li>Use VPA recommendations before enabling auto mode</li>
+    <li>Monitor scaling events</li>
+  </ul>
+
+  <hr />
+
+  <h2>🔍 Interview Self-Check</h2>
+
+  <p><b>Q:</b> Difference between HPA and Cluster Autoscaler?</p>
+  <p><b>A:</b> HPA scales Pods; Cluster Autoscaler scales nodes.</p>
+
+  <p><b>Q:</b> What happens if metrics-server is down?</p>
+  <p><b>A:</b> HPA cannot make scaling decisions.</p>
+
+  <p><b>Q:</b> Can Kubernetes scale to zero?</p>
+  <p><b>A:</b> Yes (with custom metrics or event-driven autoscaling).</p>
+
+  <hr />
+
+  <h2>➡️ What Comes Next?</h2>
+
+  <p>
+    Scaling relies heavily on configuration files.
+    Next, we master the language that defines Kubernetes itself:
+    <b>YAML</b>.
+  </p>
+
+  <p style="color:#4da3ff;">
+    👉 Proceed to <b>YAML Mastery</b>
+  </p>
+</section>

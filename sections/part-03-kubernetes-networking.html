@@ -1,0 +1,231 @@
+<section>
+  <h1 style="color:#f5c84c;">Kubernetes Networking (Deep & Practical)</h1>
+
+  <p>
+    Kubernetes networking is what allows Pods, Services, and users to
+    communicate reliably. Unlike traditional servers, Pods are ephemeral,
+    so Kubernetes provides an abstraction layer for stable networking.
+  </p>
+
+  <hr />
+
+  <h2>1️⃣ Fundamental Kubernetes Networking Rules</h2>
+
+  <ul>
+    <li>Every Pod gets its own IP address</li>
+    <li>Pods can communicate with each other without NAT</li>
+    <li>Nodes can communicate with Pods directly</li>
+    <li>Networking is flat (no port conflicts between Pods)</li>
+  </ul>
+
+  <p>
+    These rules are enforced by the Kubernetes networking model,
+    regardless of the underlying CNI plugin.
+  </p>
+
+  <hr />
+
+  <h2>2️⃣ Pod-to-Pod Communication</h2>
+
+  <pre>
+Pod A (10.244.1.5) ─────► Pod B (10.244.2.9)
+        (across nodes, no NAT)
+  </pre>
+
+  <p>
+    Kubernetes uses a <b>Container Network Interface (CNI)</b> plugin
+    to implement this connectivity (Azure CNI, Calico, Cilium, etc.).
+  </p>
+
+  <p>
+    From the application’s perspective, networking behaves as if
+    everything is on the same LAN.
+  </p>
+
+  <hr />
+
+  <h2>3️⃣ Why Services Exist</h2>
+
+  <p>
+    Pods are temporary. If a Pod is recreated, its IP changes.
+    This makes direct Pod access unreliable.
+  </p>
+
+  <p>
+    <b>Services</b> solve this by providing:
+  </p>
+
+  <ul>
+    <li>Stable IP address</li>
+    <li>Stable DNS name</li>
+    <li>Load balancing across Pods</li>
+  </ul>
+
+  <hr />
+
+  <h2>4️⃣ Service Types Explained</h2>
+
+  <h3>ClusterIP (Default)</h3>
+  <pre>
+Client Pod ──► Service (ClusterIP) ──► Backend Pods
+  </pre>
+
+  <p>
+    Used for internal communication inside the cluster.
+  </p>
+
+  <h3>NodePort</h3>
+  <pre>
+User ──► NodeIP:NodePort ──► Service ──► Pods
+  </pre>
+
+  <p>
+    Exposes the service on every node’s IP at a static port.
+  </p>
+
+  <h3>LoadBalancer</h3>
+  <pre>
+Internet
+   │
+   ▼
+Cloud Load Balancer
+   │
+   ▼
+Service ──► Pods
+  </pre>
+
+  <p>
+    In AKS, this automatically provisions an Azure Load Balancer.
+  </p>
+
+  <hr />
+
+  <h2>5️⃣ Kubernetes DNS (Critical Concept)</h2>
+
+  <p>
+    Kubernetes includes an internal DNS server (CoreDNS).
+  </p>
+
+  <pre>
+service-name.namespace.svc.cluster.local
+  </pre>
+
+  <ul>
+    <li>Automatic service discovery</li>
+    <li>No hard-coded IPs</li>
+    <li>Decouples apps from infrastructure</li>
+  </ul>
+
+  <p>
+    Example:
+  </p>
+
+  <pre>
+curl http://orders-service.default.svc.cluster.local
+  </pre>
+
+  <hr />
+
+  <h2>6️⃣ Ingress – HTTP & HTTPS Routing</h2>
+
+  <p>
+    Services expose applications, but they lack advanced routing.
+    <b>Ingress</b> solves this.
+  </p>
+
+  <pre>
+User
+ │
+ ▼
+Ingress Controller
+ ├── /api → Service A
+ └── /web → Service B
+  </pre>
+
+  <p>
+    Ingress provides:
+  </p>
+
+  <ul>
+    <li>Path-based routing</li>
+    <li>Host-based routing</li>
+    <li>TLS termination (HTTPS)</li>
+  </ul>
+
+  <hr />
+
+  <h2>7️⃣ Network Policies (Security Layer)</h2>
+
+  <p>
+    By default, all Pods can talk to each other.
+    <b>Network Policies</b> restrict traffic.
+  </p>
+
+  <pre>
+Allow:
+Frontend ──► Backend
+
+Deny:
+Backend ──► Database (except port 5432)
+  </pre>
+
+  <p>
+    Network Policies act like firewall rules for Pods.
+  </p>
+
+  <hr />
+
+  <h2>8️⃣ Real-Life Traffic Flow (AKS Example)</h2>
+
+  <pre>
+Internet
+ │
+ ▼
+Azure Load Balancer
+ │
+ ▼
+Ingress Controller
+ │
+ ▼
+Service
+ │
+ ▼
+Pods
+  </pre>
+
+  <p>
+    This architecture supports:
+  </p>
+
+  <ul>
+    <li>High availability</li>
+    <li>Zero-downtime deployments</li>
+    <li>Secure routing</li>
+  </ul>
+
+  <hr />
+
+  <h2>🔍 Interview Self-Check</h2>
+
+  <p><b>Q:</b> Why do Pods need Services?</p>
+  <p><b>A:</b> Pods are ephemeral; Services provide stability.</p>
+
+  <p><b>Q:</b> Difference between Service and Ingress?</p>
+  <p><b>A:</b> Service = networking abstraction, Ingress = HTTP routing.</p>
+
+  <p><b>Q:</b> What provides DNS in Kubernetes?</p>
+  <p><b>A:</b> CoreDNS.</p>
+
+  <hr />
+
+  <h2>➡️ What Comes Next?</h2>
+
+  <p>
+    Now that traffic flows correctly, the next step is
+    <b>scaling applications automatically</b>.
+  </p>
+
+  <p style="color:#4da3ff;">
+    👉 Proceed to <b>Kubernetes Scaling</b>
+  </p>
+</section>

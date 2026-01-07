@@ -1,0 +1,270 @@
+<section>
+  <h1 style="color:#f5c84c;">Building an Internal Developer Platform (IDP) on AKS</h1>
+
+  <p>
+    The final evolution of DevOps is not more tools.
+    It is building a <b>platform</b>.
+  </p>
+
+  <p>
+    An Internal Developer Platform (IDP) turns AKS into a
+    <b>self-service product</b> for developers,
+    while platform teams retain security, governance, and cost control.
+  </p>
+
+  <hr />
+
+  <h2>1️⃣ Why Internal Developer Platforms Exist</h2>
+
+  <p>
+    Without a platform:
+  </p>
+
+  <ul>
+    <li>Developers fight Kubernetes complexity</li>
+    <li>Platform teams become bottlenecks</li>
+    <li>Security rules are bypassed</li>
+    <li>Costs spiral out of control</li>
+  </ul>
+
+  <p>
+    An IDP solves this by hiding complexity and enforcing standards.
+  </p>
+
+  <hr />
+
+  <h2>2️⃣ What an IDP Looks Like (Big Picture)</h2>
+
+  <pre>
+Developers
+   ↓
+Self-Service Portal / CLI
+   ↓
+Git Repositories (Templates)
+   ↓
+CI Pipelines
+   ↓
+GitOps (Argo CD)
+   ↓
+AKS Platform
+  </pre>
+
+  <p>
+    Developers never touch kubectl in production.
+  </p>
+
+  <hr />
+
+  <h2>3️⃣ Core Capabilities of an IDP</h2>
+
+  <ul>
+    <li>Service creation</li>
+    <li>Environment provisioning</li>
+    <li>Standardized CI/CD</li>
+    <li>Observability by default</li>
+    <li>Security guardrails</li>
+  </ul>
+
+  <hr />
+
+  <h2>4️⃣ Golden Paths (Most Important Concept)</h2>
+
+  <p>
+    A <b>Golden Path</b> is the approved way to build and deploy services.
+  </p>
+
+  <p>
+    Example:
+  </p>
+
+  <ul>
+    <li>Approved base Docker image</li>
+    <li>Standard Helm chart</li>
+    <li>Pre-configured monitoring</li>
+    <li>Resource limits enforced</li>
+  </ul>
+
+  <p>
+    Developers follow golden paths by default.
+  </p>
+
+  <hr />
+
+  <h2>5️⃣ IDP Architecture on AKS</h2>
+
+  <pre>
+IDP Components:
+ ├── GitHub (source + templates)
+ ├── GitHub Actions (CI)
+ ├── Argo CD (CD)
+ ├── AKS (runtime)
+ ├── Azure Monitor (observability)
+ ├── Azure Policy (governance)
+  </pre>
+
+  <hr />
+
+  <h2>6️⃣ Self-Service via Git (Platform-as-Code)</h2>
+
+  <p>
+    Developers create services by committing YAML, not filing tickets.
+  </p>
+
+  <pre>
+repo/
+ ├── services/
+ │   ├── payments/
+ │   ├── orders/
+ │   └── users/
+ └── environments/
+     ├── dev/
+     ├── test/
+     └── prod/
+  </pre>
+
+  <hr />
+
+  <h2>7️⃣ Example: Service Template (YAML)</h2>
+
+  <pre>
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{service_name}}
+spec:
+  replicas: {{replicas}}
+  template:
+    spec:
+      containers:
+      - name: app
+        image: {{image}}
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+  </pre>
+
+  <p>
+    Templates prevent bad configurations.
+  </p>
+
+  <hr />
+
+  <h2>8️⃣ Python for Platform Automation</h2>
+
+  <p>
+    Python glues the platform together.
+  </p>
+
+  <ul>
+    <li>Repo scaffolding</li>
+    <li>Validation checks</li>
+    <li>Cost reporting</li>
+    <li>Security scanning</li>
+  </ul>
+
+  <pre>
+import os
+
+def create_service(name):
+    os.makedirs(f"services/{name}")
+    print(f"Service {name} created")
+  </pre>
+
+  <hr />
+
+  <h2>9️⃣ Environment Provisioning Workflow</h2>
+
+  <pre>
+Developer request
+   ↓
+Template generation
+   ↓
+PR approval
+   ↓
+Git merge
+   ↓
+Argo CD sync
+   ↓
+Service live
+  </pre>
+
+  <p>
+    Every step is auditable.
+  </p>
+
+  <hr />
+
+  <h2>🔟 Security Built Into the Platform</h2>
+
+  <ul>
+    <li>RBAC enforced by default</li>
+    <li>Secrets managed centrally</li>
+    <li>Network policies applied automatically</li>
+    <li>Policy violations blocked early</li>
+  </ul>
+
+  <hr />
+
+  <h2>1️⃣1️⃣ Cost Controls in the Platform</h2>
+
+  <ul>
+    <li>Default resource limits</li>
+    <li>Namespace quotas</li>
+    <li>Autoscaling enabled</li>
+    <li>Idle environment cleanup</li>
+  </ul>
+
+  <hr />
+
+  <h2>1️⃣2️⃣ Real Company IDP Example</h2>
+
+  <p>
+    A large SaaS company:
+  </p>
+
+  <ul>
+    <li>200+ microservices</li>
+    <li>AKS-based IDP</li>
+    <li>Self-service deployments</li>
+    <li>90% reduction in platform tickets</li>
+  </ul>
+
+  <p>
+    Platform team focused on improvement, not firefighting.
+  </p>
+
+  <hr />
+
+  <h2>1️⃣3️⃣ Common IDP Mistakes</h2>
+
+  <ul>
+    <li>Over-engineering too early</li>
+    <li>Forcing developers instead of enabling them</li>
+    <li>Ignoring developer feedback</li>
+  </ul>
+
+  <hr />
+
+  <h2>🎯 Interview & Leadership Questions</h2>
+
+  <p><b>Q:</b> What is the goal of an IDP?</p>
+  <p><b>A:</b> Enable teams to ship safely and fast.</p>
+
+  <p><b>Q:</b> Who owns the platform?</p>
+  <p><b>A:</b> Platform team, with developers as customers.</p>
+
+  <hr />
+
+  <h2>🏁 Final Words</h2>
+
+  <p>
+    Kubernetes mastery is not about YAML or kubectl.
+    It is about <b>building systems that help humans work better</b>.
+  </p>
+
+  <p style="color:#4da3ff;">
+    You now have a complete mental model of:
+    Azure → DevOps → Kubernetes → AKS → Platforms.
+  </p>
+</section>

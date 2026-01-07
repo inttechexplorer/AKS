@@ -1,0 +1,177 @@
+<section>
+  <h1 style="color:#f5c84c;">Azure Fundamentals</h1>
+
+  <p>
+    Azure is Microsoft’s global cloud platform. It provides on-demand computing,
+    networking, storage, identity, security, and managed services.
+    Azure allows you to build systems without owning physical infrastructure.
+  </p>
+
+  <hr />
+
+  <h2>1️⃣ What Problem Does Azure Solve?</h2>
+  <ul>
+    <li>No need to buy servers</li>
+    <li>No data-center maintenance</li>
+    <li>Elastic scaling based on demand</li>
+    <li>Global reach in minutes</li>
+  </ul>
+
+  <p>
+    Azure converts <b>capital expense</b> (buying hardware) into
+    <b>operational expense</b> (pay for what you use).
+  </p>
+
+  <hr />
+
+  <h2>2️⃣ Azure Global Architecture (Conceptual)</h2>
+
+  <pre>
+User
+ │
+ │ HTTPS
+ ▼
+Azure Region
+ ├── Availability Zone 1
+ ├── Availability Zone 2
+ └── Availability Zone 3
+  </pre>
+
+  <p>
+    An <b>Azure Region</b> is a geographical area (East US, Central India, West Europe).
+    Each region contains multiple <b>Availability Zones</b> for high availability.
+  </p>
+
+  <hr />
+
+  <h2>3️⃣ Azure Account Hierarchy (VERY IMPORTANT)</h2>
+
+  <pre>
+Azure Tenant (Identity Boundary)
+ └── Subscription (Billing Boundary)
+      └── Resource Group (Logical Boundary)
+           ├── Virtual Machine
+           ├── Virtual Network
+           └── AKS Cluster
+  </pre>
+
+  <ul>
+    <li><b>Tenant</b> → Identity (Entra ID / Azure AD)</li>
+    <li><b>Subscription</b> → Billing & quotas</li>
+    <li><b>Resource Group</b> → Lifecycle container</li>
+  </ul>
+
+  <p>
+    <b>Rule:</b> If you delete a Resource Group, everything inside it is deleted.
+  </p>
+
+  <hr />
+
+  <h2>4️⃣ Core Azure Services You Must Know</h2>
+
+  <h3>Compute</h3>
+  <ul>
+    <li>Virtual Machines (IaaS)</li>
+    <li>App Service (PaaS)</li>
+    <li>Azure Kubernetes Service (CaaS)</li>
+  </ul>
+
+  <h3>Networking</h3>
+  <ul>
+    <li>Virtual Network (VNet)</li>
+    <li>Subnets</li>
+    <li>Network Security Groups (NSG)</li>
+    <li>Load Balancer / Application Gateway</li>
+  </ul>
+
+  <h3>Storage</h3>
+  <ul>
+    <li>Blob Storage (objects)</li>
+    <li>File Storage</li>
+    <li>Disk Storage</li>
+  </ul>
+
+  <hr />
+
+  <h2>5️⃣ Identity & Security (Non-Negotiable)</h2>
+
+  <p>
+    Azure security is built around <b>Zero Trust</b>.
+  </p>
+
+  <ul>
+    <li>Azure Entra ID (Identity)</li>
+    <li>RBAC (Role-Based Access Control)</li>
+    <li>Managed Identities (No secrets in code)</li>
+    <li>Azure Policy (Governance)</li>
+  </ul>
+
+  <pre>
+Example RBAC:
+User → Reader → Resource Group
+DevOps → Contributor → Subscription
+AKS → Managed Identity → Azure Resources
+  </pre>
+
+  <hr />
+
+  <h2>6️⃣ Azure Networking Explained Simply</h2>
+
+  <pre>
+VNet (10.0.0.0/16)
+ ├── Subnet-App (10.0.1.0/24)
+ ├── Subnet-DB  (10.0.2.0/24)
+ └── Subnet-AKS (10.0.3.0/24)
+  </pre>
+
+  <p>
+    VNets isolate workloads. Subnets organize them.
+    NSGs act like firewalls.
+  </p>
+
+  <hr />
+
+  <h2>7️⃣ Real-Life Scenario</h2>
+
+  <p>
+    You run an e-commerce site.
+  </p>
+
+  <ul>
+    <li>Frontend → App Service</li>
+    <li>Backend → AKS</li>
+    <li>Database → Azure SQL</li>
+    <li>Traffic → Application Gateway</li>
+  </ul>
+
+  <p>
+    During sales, Azure auto-scales.
+    At night, costs drop automatically.
+  </p>
+
+  <hr />
+
+  <h2>8️⃣ Interview Self-Check</h2>
+
+  <p><b>Q:</b> Difference between Tenant and Subscription?</p>
+  <p><b>A:</b> Tenant = identity boundary, Subscription = billing boundary.</p>
+
+  <p><b>Q:</b> Why use Resource Groups?</p>
+  <p><b>A:</b> Lifecycle and logical grouping.</p>
+
+  <p><b>Q:</b> Why VNets?</p>
+  <p><b>A:</b> Isolation and security.</p>
+
+  <hr />
+
+  <h2>9️⃣ What Comes Next?</h2>
+
+  <p>
+    Azure gives infrastructure.
+    <b>Kubernetes</b> runs workloads on top of it.
+  </p>
+
+  <p style="color:#4da3ff;">
+    👉 Proceed to <b>Kubernetes Core</b> to understand how applications are actually run.
+  </p>
+</section>

@@ -1,0 +1,203 @@
+<section>
+  <h1 style="color:#f5c84c;">Python Fundamentals (DevOps First Principles)</h1>
+
+  <p>
+    Python is the most important automation language in DevOps,
+    cloud engineering, and Kubernetes ecosystems.
+    It is used not because it is fancy, but because it is powerful,
+    readable, and reliable.
+  </p>
+
+  <hr />
+
+  <h2>1️⃣ Why Python for DevOps?</h2>
+
+  <ul>
+    <li>Simple syntax (low cognitive load)</li>
+    <li>Huge ecosystem (cloud, Kubernetes, CI/CD)</li>
+    <li>Excellent scripting language</li>
+    <li>Strong API and automation support</li>
+  </ul>
+
+  <p>
+    Most DevOps engineers use Python to:
+  </p>
+
+  <ul>
+    <li>Automate infrastructure tasks</li>
+    <li>Write deployment scripts</li>
+    <li>Interact with cloud APIs</li>
+    <li>Build internal tools</li>
+  </ul>
+
+  <hr />
+
+  <h2>2️⃣ Python Execution Model</h2>
+
+  <pre>
+python script.py
+  </pre>
+
+  <p>
+    Python is interpreted line-by-line.
+    This makes it ideal for automation and scripting.
+  </p>
+
+  <hr />
+
+  <h2>3️⃣ Variables & Data Types</h2>
+
+  <pre>
+name = "web-app"
+replicas = 3
+cpu_limit = 0.5
+is_active = True
+  </pre>
+
+  <p>
+    Python uses dynamic typing.
+    You do not need to declare variable types explicitly.
+  </p>
+
+  <hr />
+
+  <h2>4️⃣ Strings & Formatting (Very Important)</h2>
+
+  <pre>
+app = "api"
+env = "prod"
+print(f"Deploying {app} to {env}")
+  </pre>
+
+  <p>
+    <b>f-strings</b> are heavily used in DevOps scripts
+    for logging and command generation.
+  </p>
+
+  <hr />
+
+  <h2>5️⃣ Lists & Dictionaries (Core Structures)</h2>
+
+  <pre>
+pods = ["pod-1", "pod-2", "pod-3"]
+
+config = {
+  "replicas": 3,
+  "image": "nginx",
+  "port": 80
+}
+  </pre>
+
+  <p>
+    Lists represent collections.
+    Dictionaries represent configuration objects.
+  </p>
+
+  <hr />
+
+  <h2>6️⃣ Conditional Logic</h2>
+
+  <pre>
+if replicas > 5:
+    print("High scale")
+else:
+    print("Normal scale")
+  </pre>
+
+  <p>
+    Conditionals are used to make deployment decisions dynamically.
+  </p>
+
+  <hr />
+
+  <h2>7️⃣ Loops (Automation Backbone)</h2>
+
+  <pre>
+for pod in pods:
+    print(f"Checking {pod}")
+  </pre>
+
+  <p>
+    Loops are used to:
+  </p>
+
+  <ul>
+    <li>Check multiple servers</li>
+    <li>Iterate through Pods</li>
+    <li>Apply configurations</li>
+  </ul>
+
+  <hr />
+
+  <h2>8️⃣ Functions (Reusable Automation)</h2>
+
+  <pre>
+def deploy(app, env):
+    print(f"Deploying {app} to {env}")
+
+deploy("api", "prod")
+  </pre>
+
+  <p>
+    Functions allow you to reuse logic across scripts.
+  </p>
+
+  <hr />
+
+  <h2>9️⃣ Working with Files (Configs & Logs)</h2>
+
+  <pre>
+with open("config.txt") as f:
+    data = f.read()
+  </pre>
+
+  <p>
+    Python is commonly used to:
+  </p>
+
+  <ul>
+    <li>Read configuration files</li>
+    <li>Parse logs</li>
+    <li>Generate YAML dynamically</li>
+  </ul>
+
+  <hr />
+
+  <h2>🔟 Running Shell Commands</h2>
+
+  <pre>
+import subprocess
+
+subprocess.run(["kubectl", "get", "pods"])
+  </pre>
+
+  <p>
+    This is how Python interacts with Kubernetes and system tools.
+  </p>
+
+  <hr />
+
+  <h2>🔍 Interview Self-Check</h2>
+
+  <p><b>Q:</b> Why is Python preferred over Bash?</p>
+  <p><b>A:</b> Better readability, error handling, and libraries.</p>
+
+  <p><b>Q:</b> What data structure is best for configs?</p>
+  <p><b>A:</b> Dictionaries.</p>
+
+  <p><b>Q:</b> Is Python compiled?</p>
+  <p><b>A:</b> No, it is interpreted.</p>
+
+  <hr />
+
+  <h2>➡️ What Comes Next?</h2>
+
+  <p>
+    Now that Python basics are clear,
+    we apply Python directly to DevOps automation.
+  </p>
+
+  <p style="color:#4da3ff;">
+    👉 Proceed to <b>Python for DevOps Automation</b>
+  </p>
+</section>

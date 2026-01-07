@@ -1,0 +1,269 @@
+<section>
+  <h1 style="color:#f5c84c;">AKS Cost Optimization, Governance & Platform Maturity</h1>
+
+  <p>
+    Mature AKS platforms are not just reliable — they are <b>efficient, governed, and predictable</b>.
+    This section shows how real teams control cloud spend, enforce standards, and evolve platforms safely.
+  </p>
+
+  <hr />
+
+  <h2>1️⃣ Where AKS Costs Come From</h2>
+
+  <ul>
+    <li>Node pools (VM size & count)</li>
+    <li>Persistent volumes (disk type & size)</li>
+    <li>Load balancers & outbound traffic</li>
+    <li>Monitoring & log ingestion</li>
+    <li>Idle environments</li>
+  </ul>
+
+  <p>
+    Most AKS overspend comes from <b>unused capacity</b>, not traffic.
+  </p>
+
+  <hr />
+
+  <h2>2️⃣ Node Pool Cost Optimization</h2>
+
+  <h3>🔹 Right-size VM SKUs</h3>
+  <pre>
+# Bad: oversized nodes
+Standard_D8s_v5
+
+# Better: right-sized
+Standard_D4s_v5
+  </pre>
+
+  <h3>🔹 Separate Node Pools</h3>
+  <pre>
+system pool → control workloads
+user pool   → application workloads
+  </pre>
+
+  <h3>🔹 Spot Node Pools (Non-critical)</h3>
+  <pre>
+az aks nodepool add \
+  --cluster-name prod-aks \
+  --resource-group rg-prod \
+  --name spotpool \
+  --priority Spot \
+  --eviction-policy Delete
+  </pre>
+
+  <p>
+    Spot nodes reduce cost but must tolerate eviction.
+  </p>
+
+  <hr />
+
+  <h2>3️⃣ Autoscaling = Cost Control</h2>
+
+  <h3>🔹 Cluster Autoscaler</h3>
+  <pre>
+--enable-cluster-autoscaler \
+--min-count 2 \
+--max-count 8
+  </pre>
+
+  <h3>🔹 Horizontal Pod Autoscaler</h3>
+  <pre>
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+spec:
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  </pre>
+
+  <p>
+    Scaling down is as important as scaling up.
+  </p>
+
+  <hr />
+
+  <h2>4️⃣ Storage Cost Optimization</h2>
+
+  <ul>
+    <li>Use Standard disks for dev/test</li>
+    <li>Premium only for latency-sensitive apps</li>
+    <li>Delete unused PVCs</li>
+  </ul>
+
+  <pre>
+kubectl get pvc
+kubectl delete pvc unused-pvc
+  </pre>
+
+  <hr />
+
+  <h2>5️⃣ Logging & Monitoring Cost Control</h2>
+
+  <p>
+    Logs are a silent cost driver.
+  </p>
+
+  <ul>
+    <li>Reduce retention period</li>
+    <li>Filter noisy logs</li>
+    <li>Separate prod vs dev workspaces</li>
+  </ul>
+
+  <pre>
+# Azure Monitor retention
+Retention: 30 days (not 365)
+  </pre>
+
+  <hr />
+
+  <h2>6️⃣ Governance: Why It Matters</h2>
+
+  <p>
+    Governance prevents:
+  </p>
+
+  <ul>
+    <li>Cost explosions</li>
+    <li>Security violations</li>
+    <li>Platform drift</li>
+  </ul>
+
+  <p>
+    Governance is not bureaucracy — it is <b>guardrails</b>.
+  </p>
+
+  <hr />
+
+  <h2>7️⃣ Azure Policy for AKS</h2>
+
+  <h3>🔹 Example: Require Resource Limits</h3>
+  <pre>
+policy:
+  enforce CPU & memory limits on pods
+  </pre>
+
+  <p>
+    Prevents runaway workloads.
+  </p>
+
+  <hr />
+
+  <h2>8️⃣ Kubernetes Resource Quotas</h2>
+
+  <pre>
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: team-quota
+spec:
+  hard:
+    requests.cpu: "10"
+    requests.memory: 20Gi
+    limits.cpu: "20"
+    limits.memory: 40Gi
+  </pre>
+
+  <p>
+    Teams cannot consume unlimited resources.
+  </p>
+
+  <hr />
+
+  <h2>9️⃣ RBAC as Governance</h2>
+
+  <ul>
+    <li>Platform team → cluster admin</li>
+    <li>App teams → namespace admin</li>
+    <li>Developers → read-only in prod</li>
+  </ul>
+
+  <pre>
+kind: Role
+rules:
+- apiGroups: ["apps"]
+  resources: ["deployments"]
+  verbs: ["get","list","watch"]
+  </pre>
+
+  <hr />
+
+  <h2>🔟 GitOps as Governance Engine</h2>
+
+  <p>
+    GitOps enforces:
+  </p>
+
+  <ul>
+    <li>Change control</li>
+    <li>Approval workflows</li>
+    <li>Audit trails</li>
+  </ul>
+
+  <p>
+    No Git commit = no deployment.
+  </p>
+
+  <hr />
+
+  <h2>1️⃣1️⃣ Platform Maturity Levels</h2>
+
+  <pre>
+Level 1: Manual kubectl
+Level 2: CI/CD pipelines
+Level 3: GitOps
+Level 4: Policy-driven platform
+Level 5: Self-service internal platform
+  </pre>
+
+  <p>
+    Mature platforms reduce toil and risk.
+  </p>
+
+  <hr />
+
+  <h2>1️⃣2️⃣ Real Production Optimization Project</h2>
+
+  <p>
+    A fintech platform reduced monthly AKS cost by 38% by:
+  </p>
+
+  <ul>
+    <li>Right-sizing node pools</li>
+    <li>Enabling autoscaling</li>
+    <li>Using Spot nodes</li>
+    <li>Reducing log retention</li>
+  </ul>
+
+  <p>
+    Reliability improved while cost dropped.
+  </p>
+
+  <hr />
+
+  <h2>🎯 Interview & Real-World Questions</h2>
+
+  <p><b>Q:</b> What causes AKS overspend?</p>
+  <p><b>A:</b> Idle nodes and unbounded scaling.</p>
+
+  <p><b>Q:</b> How do you enforce standards?</p>
+  <p><b>A:</b> Azure Policy + GitOps + RBAC.</p>
+
+  <hr />
+
+  <h2>➡️ What Comes Next?</h2>
+
+  <p>
+    The final step is <b>platform enablement</b> —
+    turning AKS into a self-service product.
+  </p>
+
+  <p style="color:#4da3ff;">
+    👉 Next: <b>Building an Internal Developer Platform (IDP) on AKS</b>
+  </p>
+</section>

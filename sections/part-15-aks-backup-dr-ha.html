@@ -1,0 +1,254 @@
+<section>
+  <h1 style="color:#f5c84c;">AKS Backup, Disaster Recovery & High Availability</h1>
+
+  <p>
+    High Availability (HA) keeps your system running.
+    Disaster Recovery (DR) brings it back after catastrophe.
+    Backups are the foundation of both.
+  </p>
+
+  <hr />
+
+  <h2>1️⃣ Failure Types You Must Design For</h2>
+
+  <ul>
+    <li>Pod crash (application failure)</li>
+    <li>Node failure (VM or disk issue)</li>
+    <li>Zone outage (datacenter problem)</li>
+    <li>Region outage (rare but real)</li>
+    <li>Human error (deletes, misconfigurations)</li>
+  </ul>
+
+  <hr />
+
+  <h2>2️⃣ High Availability in AKS (Baseline)</h2>
+
+  <h3>🔹 Multi-node Pools</h3>
+  <pre>
+az aks nodepool add \
+  --cluster-name prod-aks \
+  --resource-group rg-prod \
+  --name userpool \
+  --node-count 3
+  </pre>
+
+  <h3>🔹 Pod Replicas</h3>
+  <pre>
+spec:
+  replicas: 3
+  </pre>
+
+  <h3>🔹 Pod Anti-Affinity</h3>
+  <pre>
+affinity:
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+    - labelSelector:
+        matchLabels:
+          app: myapp
+      topologyKey: kubernetes.io/hostname
+  </pre>
+
+  <p>
+    This ensures pods do not land on the same node.
+  </p>
+
+  <hr />
+
+  <h2>3️⃣ Zone Redundancy (AZ-level HA)</h2>
+
+  <p>
+    Use Availability Zones to survive datacenter failures.
+  </p>
+
+  <pre>
+az aks create \
+  --zones 1 2 3 \
+  --node-count 3
+  </pre>
+
+  <p>
+    Pods automatically reschedule across zones.
+  </p>
+
+  <hr />
+
+  <h2>4️⃣ Application-Level HA Patterns</h2>
+
+  <ul>
+    <li>Stateless apps (preferred)</li>
+    <li>Externalized state (DB, cache)</li>
+    <li>Graceful shutdowns</li>
+  </ul>
+
+  <pre>
+lifecycle:
+  preStop:
+    exec:
+      command: ["sh", "-c", "sleep 10"]
+  </pre>
+
+  <hr />
+
+  <h2>5️⃣ What Needs to Be Backed Up?</h2>
+
+  <ul>
+    <li>Kubernetes manifests</li>
+    <li>Persistent volumes</li>
+    <li>Secrets & ConfigMaps</li>
+    <li>Helm releases</li>
+    <li>Cluster configuration</li>
+  </ul>
+
+  <p>
+    GitOps covers manifests.
+    Storage backups cover data.
+  </p>
+
+  <hr />
+
+  <h2>6️⃣ AKS Backup Strategy (Velero)</h2>
+
+  <h3>🔹 Install Velero</h3>
+  <pre>
+velero install \
+  --provider azure \
+  --bucket velero \
+  --backup-location-config resourceGroup=rg-backup,storageAccount=stbackup
+  </pre>
+
+  <h3>🔹 Backup Cluster State</h3>
+  <pre>
+velero backup create daily-backup
+  </pre>
+
+  <h3>🔹 Restore After Failure</h3>
+  <pre>
+velero restore create --from-backup daily-backup
+  </pre>
+
+  <hr />
+
+  <h2>7️⃣ Persistent Volume Backup</h2>
+
+  <p>
+    Use snapshot-capable storage classes.
+  </p>
+
+  <pre>
+kind: StorageClass
+parameters:
+  skuName: Premium_LRS
+  </pre>
+
+  <p>
+    Snapshots are incremental and fast.
+  </p>
+
+  <hr />
+
+  <h2>8️⃣ Disaster Recovery Models</h2>
+
+  <h3>🔹 Active-Passive</h3>
+  <ul>
+    <li>Primary AKS cluster</li>
+    <li>Secondary cluster idle</li>
+    <li>Failover via DNS</li>
+  </ul>
+
+  <h3>🔹 Active-Active</h3>
+  <ul>
+    <li>Two live clusters</li>
+    <li>Traffic split</li>
+    <li>Higher cost, higher resilience</li>
+  </ul>
+
+  <hr />
+
+  <h2>9️⃣ Multi-Region Architecture</h2>
+
+  <pre>
+Users
+ ↓
+Azure Front Door
+ ↓
+AKS (Region A) + AKS (Region B)
+  </pre>
+
+  <p>
+    Azure Front Door performs health checks and routing.
+  </p>
+
+  <hr />
+
+  <h2>🔟 Real Production DR Project</h2>
+
+  <p>
+    An e-commerce platform:
+  </p>
+
+  <ul>
+    <li>GitOps for manifests</li>
+    <li>Velero nightly backups</li>
+    <li>Azure Front Door</li>
+    <li>Geo-replicated database</li>
+  </ul>
+
+  <p>
+    Result:
+  </p>
+
+  <ul>
+    <li>RTO &lt; 15 minutes</li>
+    <li>RPO &lt; 5 minutes</li>
+  </ul>
+
+  <hr />
+
+  <h2>1️⃣1️⃣ Testing Your DR Plan</h2>
+
+  <pre>
+# Delete namespace (controlled test)
+kubectl delete ns production
+
+# Restore
+velero restore create --from-backup daily-backup
+  </pre>
+
+  <p>
+    If you don’t test recovery, you don’t have a DR plan.
+  </p>
+
+  <hr />
+
+  <h2>1️⃣2️⃣ Common Backup & DR Mistakes</h2>
+
+  <ul>
+    <li>Backing up manifests but not data</li>
+    <li>No restore testing</li>
+    <li>Single-region dependency</li>
+  </ul>
+
+  <hr />
+
+  <h2>🎯 Interview & Real-World Questions</h2>
+
+  <p><b>Q:</b> Is GitOps a backup?</p>
+  <p><b>A:</b> It backs configuration, not data.</p>
+
+  <p><b>Q:</b> What defines RTO vs RPO?</p>
+  <p><b>A:</b> Recovery time vs data loss tolerance.</p>
+
+  <hr />
+
+  <h2>➡️ What Comes Next?</h2>
+
+  <p>
+    With resilience covered,
+    the final layer is <b>cost, governance, and platform optimization</b>.
+  </p>
+
+  <p style="color:#4da3ff;">
+    👉 Next: <b>AKS Cost Optimization, Governance & Platform Maturity</b>
+  </p>
+</section>

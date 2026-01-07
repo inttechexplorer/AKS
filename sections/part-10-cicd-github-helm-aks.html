@@ -1,0 +1,273 @@
+<section>
+  <h1 style="color:#f5c84c;">CI/CD: GitHub Actions → Helm → AKS (End-to-End)</h1>
+
+  <p>
+    CI/CD is the backbone of modern DevOps.
+    This section explains every moving part of a production-grade pipeline
+    that builds, tests, packages, and deploys applications to AKS using Helm.
+  </p>
+
+  <hr />
+
+  <h2>1️⃣ What CI/CD Really Means</h2>
+
+  <ul>
+    <li><b>CI (Continuous Integration)</b> – Code is built & tested on every change</li>
+    <li><b>CD (Continuous Delivery)</b> – Artifacts are prepared for release</li>
+    <li><b>CD (Continuous Deployment)</b> – Changes are deployed automatically</li>
+  </ul>
+
+  <p>
+    The goal is <b>fast feedback</b>, <b>low risk</b>, and <b>repeatability</b>.
+  </p>
+
+  <hr />
+
+  <h2>2️⃣ High-Level Pipeline Flow</h2>
+
+  <pre>
+Developer Pushes Code
+        │
+        ▼
+GitHub Actions Pipeline
+ ├── Build
+ ├── Test
+ ├── Security Scan
+ ├── Docker Image Build
+ ├── Push to Registry
+ └── Helm Deploy to AKS
+        │
+        ▼
+AKS Cluster Updated
+  </pre>
+
+  <hr />
+
+  <h2>3️⃣ Why GitHub Actions?</h2>
+
+  <ul>
+    <li>Native to GitHub</li>
+    <li>YAML-based</li>
+    <li>First-class support for cloud & Kubernetes</li>
+    <li>Strong secrets & environment support</li>
+  </ul>
+
+  <hr />
+
+  <h2>4️⃣ Pipeline Trigger</h2>
+
+  <pre>
+on:
+  push:
+    branches:
+      - main
+  </pre>
+
+  <p>
+    This ensures the pipeline runs whenever code is merged to <b>main</b>.
+  </p>
+
+  <hr />
+
+  <h2>5️⃣ Jobs & Runners</h2>
+
+  <pre>
+jobs:
+  build:
+    runs-on: ubuntu-latest
+  </pre>
+
+  <p>
+    Each job runs in an isolated runner.
+    Runners are ephemeral and stateless.
+  </p>
+
+  <hr />
+
+  <h2>6️⃣ Checkout Code</h2>
+
+  <pre>
+- name: Checkout repository
+  uses: actions/checkout@v4
+  </pre>
+
+  <p>
+    This pulls your repository into the runner.
+  </p>
+
+  <hr />
+
+  <h2>7️⃣ Build & Test Stage</h2>
+
+  <pre>
+- name: Install dependencies
+  run: pip install -r requirements.txt
+
+- name: Run tests
+  run: pytest
+  </pre>
+
+  <p>
+    Fail fast.
+    If tests fail, the pipeline stops immediately.
+  </p>
+
+  <hr />
+
+  <h2>8️⃣ Docker Image Build</h2>
+
+  <pre>
+- name: Build Docker image
+  run: |
+    docker build -t myapp:${{ github.sha }} .
+  </pre>
+
+  <p>
+    Each commit produces a uniquely versioned image.
+  </p>
+
+  <hr />
+
+  <h2>9️⃣ Pushing to Container Registry</h2>
+
+  <pre>
+- name: Login to registry
+  run: echo $CR_PASSWORD | docker login -u $CR_USER --password-stdin
+
+- name: Push image
+  run: docker push myapp:${{ github.sha }}
+  </pre>
+
+  <p>
+    Credentials are stored in <b>GitHub Secrets</b>, never in code.
+  </p>
+
+  <hr />
+
+  <h2>🔟 Why Helm in CI/CD?</h2>
+
+  <p>
+    Helm provides:
+  </p>
+
+  <ul>
+    <li>Versioned deployments</li>
+    <li>Rollbacks</li>
+    <li>Environment-specific values</li>
+    <li>Consistency across clusters</li>
+  </ul>
+
+  <hr />
+
+  <h2>1️⃣1️⃣ Helm Deploy Step</h2>
+
+  <pre>
+- name: Deploy to AKS
+  run: |
+    helm upgrade --install myapp ./chart \
+      --set image.tag=${{ github.sha }} \
+      -f values-prod.yaml
+  </pre>
+
+  <p>
+    This command is:
+  </p>
+
+  <ul>
+    <li>Idempotent</li>
+    <li>Safe to re-run</li>
+    <li>Version aware</li>
+  </ul>
+
+  <hr />
+
+  <h2>1️⃣2️⃣ Kubernetes Context & Authentication</h2>
+
+  <pre>
+- name: Set kubeconfig
+  run: |
+    az aks get-credentials \
+      --resource-group rg-aks \
+      --name aks-cluster
+  </pre>
+
+  <p>
+    Authentication uses Azure identities, not passwords.
+  </p>
+
+  <hr />
+
+  <h2>1️⃣3️⃣ Environments & Approvals</h2>
+
+  <p>
+    GitHub Environments allow:
+  </p>
+
+  <ul>
+    <li>Manual approvals</li>
+    <li>Scoped secrets</li>
+    <li>Deployment visibility</li>
+  </ul>
+
+  <pre>
+environment:
+  name: production
+  </pre>
+
+  <hr />
+
+  <h2>1️⃣4️⃣ Rollback Strategy</h2>
+
+  <pre>
+helm rollback myapp
+  </pre>
+
+  <p>
+    Rollbacks are instant because Helm keeps state.
+  </p>
+
+  <hr />
+
+  <h2>1️⃣5️⃣ Real-Life Production Scenario</h2>
+
+  <p>
+    A SaaS platform deploys:
+  </p>
+
+  <ul>
+    <li>20+ microservices</li>
+    <li>Multiple environments</li>
+    <li>Zero-downtime releases</li>
+    <li>Instant rollbacks</li>
+  </ul>
+
+  <p>
+    CI/CD ensures reliability without human intervention.
+  </p>
+
+  <hr />
+
+  <h2>🔍 Interview Self-Check</h2>
+
+  <p><b>Q:</b> Why use Helm in CI/CD?</p>
+  <p><b>A:</b> Versioning, rollbacks, environment control.</p>
+
+  <p><b>Q:</b> Where are secrets stored?</p>
+  <p><b>A:</b> GitHub Secrets / Azure Key Vault.</p>
+
+  <p><b>Q:</b> What makes pipelines safe?</p>
+  <p><b>A:</b> Idempotency and automation.</p>
+
+  <hr />
+
+  <h2>➡️ What Comes Next?</h2>
+
+  <p>
+    Now that deployments are automated,
+    we must understand AKS architecture, networking, and security deeply.
+  </p>
+
+  <p style="color:#4da3ff;">
+    👉 Proceed to <b>AKS Architecture, Networking & Security</b>
+  </p>
+</section>

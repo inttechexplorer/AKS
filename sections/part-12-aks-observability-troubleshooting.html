@@ -1,0 +1,283 @@
+<section>
+  <h1 style="color:#f5c84c;">AKS Observability & Troubleshooting (Logs, Metrics, Traces)</h1>
+
+  <p>
+    Observability is the difference between <b>guessing</b> and <b>knowing</b>.
+    In production AKS environments, failures are inevitable — what matters
+    is how fast and accurately you can detect, understand, and resolve them.
+  </p>
+
+  <hr />
+
+  <h2>1️⃣ What Observability Means in Kubernetes</h2>
+
+  <p>
+    Observability answers three core questions:
+  </p>
+
+  <ul>
+    <li><b>What is happening?</b> → Metrics</li>
+    <li><b>Why is it happening?</b> → Logs</li>
+    <li><b>Where did it happen?</b> → Traces</li>
+  </ul>
+
+  <pre>
+Metrics → Detect problems
+Logs    → Diagnose problems
+Traces  → Locate problems
+  </pre>
+
+  <hr />
+
+  <h2>2️⃣ AKS Native Observability Stack</h2>
+
+  <p>
+    AKS integrates deeply with Azure’s observability ecosystem:
+  </p>
+
+  <ul>
+    <li>Azure Monitor</li>
+    <li>Container Insights</li>
+    <li>Log Analytics Workspace</li>
+    <li>Application Insights</li>
+  </ul>
+
+  <pre>
+AKS
+ ├── Metrics → Azure Monitor
+ ├── Logs → Log Analytics
+ └── Traces → Application Insights
+  </pre>
+
+  <hr />
+
+  <h2>3️⃣ Metrics in AKS (The First Alarm)</h2>
+
+  <p>
+    Metrics are numeric values collected at regular intervals.
+    They are used to trigger alerts and autoscaling.
+  </p>
+
+  <p><b>Common AKS Metrics:</b></p>
+
+  <ul>
+    <li>Node CPU & memory usage</li>
+    <li>Pod CPU & memory usage</li>
+    <li>Disk I/O</li>
+    <li>Network throughput</li>
+  </ul>
+
+  <p>
+    Metrics answer:
+    <b>“Is something wrong right now?”</b>
+  </p>
+
+  <hr />
+
+  <h2>4️⃣ Logs in AKS (The Explanation)</h2>
+
+  <p>
+    Logs are detailed event records produced by:
+  </p>
+
+  <ul>
+    <li>Containers</li>
+    <li>Kubernetes components</li>
+    <li>Nodes</li>
+    <li>Ingress controllers</li>
+  </ul>
+
+  <pre>
+kubectl logs pod-name
+kubectl logs pod-name -c container-name
+  </pre>
+
+  <p>
+    Logs answer:
+    <b>“Why did this fail?”</b>
+  </p>
+
+  <hr />
+
+  <h2>5️⃣ Traces in AKS (The Path)</h2>
+
+  <p>
+    Traces track a single request across multiple services.
+  </p>
+
+  <pre>
+User Request
+ → Ingress
+ → Service A
+ → Service B
+ → Database
+  </pre>
+
+  <p>
+    Traces are essential in microservices architectures.
+  </p>
+
+  <hr />
+
+  <h2>6️⃣ Enabling Container Insights</h2>
+
+  <p>
+    Container Insights must be enabled to collect AKS telemetry.
+  </p>
+
+  <pre>
+az aks enable-addons \
+  --addons monitoring \
+  --name myAKS \
+  --resource-group myRG
+  </pre>
+
+  <p>
+    This automatically connects AKS to Log Analytics.
+  </p>
+
+  <hr />
+
+  <h2>7️⃣ Log Analytics Queries (KQL Basics)</h2>
+
+  <p>
+    AKS logs are queried using Kusto Query Language (KQL).
+  </p>
+
+  <pre>
+ContainerLog
+| where TimeGenerated > ago(10m)
+| where LogEntry contains "error"
+  </pre>
+
+  <p>
+    KQL lets you filter, aggregate, and correlate logs.
+  </p>
+
+  <hr />
+
+  <h2>8️⃣ Application Insights for AKS</h2>
+
+  <p>
+    Application Insights provides:
+  </p>
+
+  <ul>
+    <li>Request tracking</li>
+    <li>Dependency maps</li>
+    <li>Latency breakdowns</li>
+    <li>Error rates</li>
+  </ul>
+
+  <p>
+    It is most powerful when instrumented via SDKs.
+  </p>
+
+  <hr />
+
+  <h2>9️⃣ Python Example: Logging in AKS</h2>
+
+  <pre>
+import logging
+
+logging.basicConfig(level=logging.INFO)
+
+logging.info("Service started")
+logging.error("Database connection failed")
+  </pre>
+
+  <p>
+    These logs automatically appear in Log Analytics.
+  </p>
+
+  <hr />
+
+  <h2>🔟 Troubleshooting Workflow (Real-World)</h2>
+
+  <p>
+    A production outage follows this flow:
+  </p>
+
+  <pre>
+Alert fired
+ → Check metrics
+ → Inspect pod logs
+ → Describe resources
+ → Check events
+ → Fix root cause
+  </pre>
+
+  <pre>
+kubectl get pods
+kubectl describe pod pod-name
+kubectl get events
+  </pre>
+
+  <hr />
+
+  <h2>1️⃣1️⃣ Common AKS Failures</h2>
+
+  <ul>
+    <li>ImagePullBackOff</li>
+    <li>CrashLoopBackOff</li>
+    <li>OOMKilled</li>
+    <li>Node NotReady</li>
+  </ul>
+
+  <p>
+    Each failure leaves clear signals in metrics and logs.
+  </p>
+
+  <hr />
+
+  <h2>1️⃣2️⃣ Alerts & Action Groups</h2>
+
+  <p>
+    Alerts notify humans or automation when thresholds are breached.
+  </p>
+
+  <ul>
+    <li>Email</li>
+    <li>SMS</li>
+    <li>Webhook</li>
+    <li>Logic Apps</li>
+  </ul>
+
+  <p>
+    Alerts turn observability into action.
+  </p>
+
+  <hr />
+
+  <h2>1️⃣3️⃣ Production Best Practices</h2>
+
+  <ul>
+    <li>Enable monitoring on day one</li>
+    <li>Set alerts before incidents</li>
+    <li>Correlate metrics and logs</li>
+    <li>Instrument applications</li>
+  </ul>
+
+  <hr />
+
+  <h2>🔍 Interview Self-Check</h2>
+
+  <p><b>Q:</b> What is the difference between logs and metrics?</p>
+  <p><b>A:</b> Metrics show symptoms; logs explain causes.</p>
+
+  <p><b>Q:</b> Why are traces important?</p>
+  <p><b>A:</b> They show request paths across microservices.</p>
+
+  <hr />
+
+  <h2>➡️ What Comes Next?</h2>
+
+  <p>
+    Observability tells us what happened.
+    Next, we must control deployments declaratively.
+  </p>
+
+  <p style="color:#4da3ff;">
+    👉 Proceed to <b>GitOps with ArgoCD (Production Workflows)</b>
+  </p>
+</section>

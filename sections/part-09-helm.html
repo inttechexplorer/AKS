@@ -1,0 +1,206 @@
+<section>
+  <h1 style="color:#f5c84c;">Helm Charts (From Zero to Production)</h1>
+
+  <p>
+    Helm is the package manager for Kubernetes.
+    It solves the problem of managing complex Kubernetes applications
+    that consist of many YAML files.
+  </p>
+
+  <hr />
+
+  <h2>1️⃣ Why Helm Exists</h2>
+
+  <p>
+    Raw Kubernetes YAML becomes difficult to manage when:
+  </p>
+
+  <ul>
+    <li>Multiple environments exist (dev, test, prod)</li>
+    <li>Values change per environment</li>
+    <li>Applications have many resources</li>
+    <li>Upgrades and rollbacks are needed</li>
+  </ul>
+
+  <p>
+    Helm introduces <b>templating, versioning, and releases</b>.
+  </p>
+
+  <hr />
+
+  <h2>2️⃣ Helm Concepts (Very Important)</h2>
+
+  <ul>
+    <li><b>Chart</b> – A Helm package</li>
+    <li><b>Release</b> – A deployed instance of a chart</li>
+    <li><b>Repository</b> – Storage for charts</li>
+    <li><b>values.yaml</b> – Configuration input</li>
+  </ul>
+
+  <hr />
+
+  <h2>3️⃣ Helm Chart Structure</h2>
+
+  <pre>
+my-chart/
+ ├── Chart.yaml
+ ├── values.yaml
+ ├── templates/
+ │    ├── deployment.yaml
+ │    ├── service.yaml
+ │    └── ingress.yaml
+ └── charts/
+  </pre>
+
+  <p>
+    This structure allows reuse and customization.
+  </p>
+
+  <hr />
+
+  <h2>4️⃣ Chart.yaml Explained</h2>
+
+  <pre>
+apiVersion: v2
+name: my-app
+version: 1.0.0
+appVersion: "1.0"
+  </pre>
+
+  <p>
+    <b>version</b> refers to the chart.
+    <b>appVersion</b> refers to the application.
+  </p>
+
+  <hr />
+
+  <h2>5️⃣ values.yaml (Configuration Layer)</h2>
+
+  <pre>
+replicaCount: 3
+
+image:
+  repository: nginx
+  tag: latest
+
+service:
+  port: 80
+  </pre>
+
+  <p>
+    values.yaml contains environment-specific configuration.
+  </p>
+
+  <hr />
+
+  <h2>6️⃣ Helm Templates</h2>
+
+  <pre>
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  template:
+    spec:
+      containers:
+      - name: app
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+  </pre>
+
+  <p>
+    Helm uses Go templating to inject values dynamically.
+  </p>
+
+  <hr />
+
+  <h2>7️⃣ Installing a Helm Chart</h2>
+
+  <pre>
+helm install my-release ./my-chart
+  </pre>
+
+  <p>
+    This creates a <b>release</b> in Kubernetes.
+  </p>
+
+  <hr />
+
+  <h2>8️⃣ Upgrading a Release</h2>
+
+  <pre>
+helm upgrade my-release ./my-chart
+  </pre>
+
+  <p>
+    Helm tracks revisions automatically.
+  </p>
+
+  <hr />
+
+  <h2>9️⃣ Rollbacks (Production Safety)</h2>
+
+  <pre>
+helm history my-release
+helm rollback my-release 1
+  </pre>
+
+  <p>
+    Rollbacks are instant and reliable.
+  </p>
+
+  <hr />
+
+  <h2>🔟 Helm with Multiple Environments</h2>
+
+  <pre>
+helm install my-app ./chart -f values-dev.yaml
+helm install my-app ./chart -f values-prod.yaml
+  </pre>
+
+  <p>
+    Same chart, different environments.
+  </p>
+
+  <hr />
+
+  <h2>1️⃣1️⃣ Real-Life Production Use Case</h2>
+
+  <p>
+    A microservices platform uses Helm to:
+  </p>
+
+  <ul>
+    <li>Deploy 20+ services</li>
+    <li>Standardize configuration</li>
+    <li>Perform zero-downtime upgrades</li>
+    <li>Rollback instantly on failure</li>
+  </ul>
+
+  <hr />
+
+  <h2>🔍 Interview Self-Check</h2>
+
+  <p><b>Q:</b> Why Helm instead of raw YAML?</p>
+  <p><b>A:</b> Templating, reuse, versioning.</p>
+
+  <p><b>Q:</b> What is a release?</p>
+  <p><b>A:</b> A deployed instance of a chart.</p>
+
+  <p><b>Q:</b> How does Helm support rollbacks?</p>
+  <p><b>A:</b> Revision history.</p>
+
+  <hr />
+
+  <h2>➡️ What Comes Next?</h2>
+
+  <p>
+    Helm simplifies deployments.
+    Next, we automate everything with CI/CD pipelines.
+  </p>
+
+  <p style="color:#4da3ff;">
+    👉 Proceed to <b>CI/CD: GitHub Actions → Helm → AKS</b>
+  </p>
+</section>

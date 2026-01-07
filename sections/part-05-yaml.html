@@ -1,0 +1,214 @@
+<section>
+  <h1 style="color:#f5c84c;">YAML Mastery (The Language of Kubernetes & DevOps)</h1>
+
+  <p>
+    YAML is the backbone of Kubernetes, CI/CD pipelines, and modern DevOps.
+    If Kubernetes is the engine, YAML is the instruction manual.
+  </p>
+
+  <hr />
+
+  <h2>1️⃣ What Is YAML?</h2>
+
+  <p>
+    YAML stands for <b>YAML Ain’t Markup Language</b>.
+    It is a human-readable data serialization format.
+  </p>
+
+  <p>
+    YAML is used to:
+  </p>
+
+  <ul>
+    <li>Define Kubernetes resources</li>
+    <li>Configure CI/CD pipelines</li>
+    <li>Describe cloud infrastructure</li>
+    <li>Pass structured configuration to applications</li>
+  </ul>
+
+  <hr />
+
+  <h2>2️⃣ Core YAML Rules (Very Important)</h2>
+
+  <ul>
+    <li>Indentation defines structure (spaces only, no tabs)</li>
+    <li>Key-value pairs use <code>key: value</code></li>
+    <li>Lists start with <code>-</code></li>
+    <li>Whitespace matters</li>
+  </ul>
+
+  <pre>
+name: web-app
+replicas: 3
+ports:
+  - 80
+  - 443
+  </pre>
+
+  <p>
+    Incorrect indentation will break deployments.
+  </p>
+
+  <hr />
+
+  <h2>3️⃣ YAML Data Types</h2>
+
+  <pre>
+string: "hello"
+number: 8080
+boolean: true
+null_value: null
+  </pre>
+
+  <p>
+    Kubernetes automatically interprets these values.
+  </p>
+
+  <hr />
+
+  <h2>4️⃣ Lists & Maps Explained</h2>
+
+  <pre>
+containers:
+  - name: app
+    image: nginx
+  - name: sidecar
+    image: redis
+  </pre>
+
+  <p>
+    This defines a list of container objects.
+  </p>
+
+  <hr />
+
+  <h2>5️⃣ Kubernetes YAML Anatomy</h2>
+
+  <pre>
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+      - name: app
+        image: nginx
+  </pre>
+
+  <p>
+    Every Kubernetes YAML follows this structure:
+  </p>
+
+  <ul>
+    <li><b>apiVersion</b> – API group</li>
+    <li><b>kind</b> – Resource type</li>
+    <li><b>metadata</b> – Name, labels</li>
+    <li><b>spec</b> – Desired state</li>
+  </ul>
+
+  <hr />
+
+  <h2>6️⃣ Multi-Document YAML</h2>
+
+  <pre>
+---
+apiVersion: v1
+kind: Service
+---
+apiVersion: apps/v1
+kind: Deployment
+  </pre>
+
+  <p>
+    Used to apply multiple resources in one file.
+  </p>
+
+  <hr />
+
+  <h2>7️⃣ YAML Anchors & Aliases (Advanced)</h2>
+
+  <pre>
+defaults: &defaults
+  image: nginx
+  ports:
+    - 80
+
+container1:
+  <<: *defaults
+
+container2:
+  <<: *defaults
+  image: apache
+  </pre>
+
+  <p>
+    Reduces duplication in large configs.
+  </p>
+
+  <hr />
+
+  <h2>8️⃣ Common YAML Mistakes</h2>
+
+  <ul>
+    <li>Using tabs instead of spaces</li>
+    <li>Wrong indentation levels</li>
+    <li>Missing required Kubernetes fields</li>
+    <li>Quoting numbers unintentionally</li>
+  </ul>
+
+  <hr />
+
+  <h2>9️⃣ YAML in DevOps Pipelines</h2>
+
+  <pre>
+name: CI Pipeline
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: npm install
+      - run: npm test
+  </pre>
+
+  <p>
+    This is a GitHub Actions pipeline written in YAML.
+  </p>
+
+  <hr />
+
+  <h2>🔍 Interview Self-Check</h2>
+
+  <p><b>Q:</b> Why is YAML preferred over JSON in Kubernetes?</p>
+  <p><b>A:</b> YAML is more readable and supports comments.</p>
+
+  <p><b>Q:</b> What breaks YAML most often?</p>
+  <p><b>A:</b> Indentation errors.</p>
+
+  <p><b>Q:</b> Can YAML have multiple documents?</p>
+  <p><b>A:</b> Yes, using <code>---</code>.</p>
+
+  <hr />
+
+  <h2>➡️ What Comes Next?</h2>
+
+  <p>
+    YAML defines infrastructure.
+    Now we move to the language that automates it:
+    <b>Python</b>.
+  </p>
+
+  <p style="color:#4da3ff;">
+    👉 Proceed to <b>Python Fundamentals (DevOps First Principles)</b>
+  </p>
+</section>

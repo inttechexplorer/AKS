@@ -1,0 +1,272 @@
+<section>
+  <h1 style="color:#f5c84c;">GitOps with Argo CD (Production-grade Kubernetes Workflows)</h1>
+
+  <p>
+    GitOps is the evolution of DevOps.
+    Instead of deploying from pipelines directly into clusters,
+    <b>Git becomes the single source of truth</b> for everything that runs in Kubernetes.
+  </p>
+
+  <hr />
+
+  <h2>1️⃣ What is GitOps?</h2>
+
+  <p>
+    GitOps is an operational model where:
+  </p>
+
+  <ul>
+    <li>Git stores the desired state</li>
+    <li>Kubernetes stores the live state</li>
+    <li>A controller continuously reconciles the two</li>
+  </ul>
+
+  <pre>
+Git Repository (Desired State)
+        ↓
+GitOps Controller (Argo CD)
+        ↓
+Kubernetes Cluster (Live State)
+  </pre>
+
+  <p>
+    If someone manually changes the cluster,
+    GitOps detects drift and corrects it automatically.
+  </p>
+
+  <hr />
+
+  <h2>2️⃣ Why GitOps Matters in AKS</h2>
+
+  <ul>
+    <li>Auditable deployments</li>
+    <li>Easy rollbacks</li>
+    <li>Disaster recovery via Git</li>
+    <li>Multi-cluster consistency</li>
+  </ul>
+
+  <p>
+    In regulated industries, GitOps is not optional — it is mandatory.
+  </p>
+
+  <hr />
+
+  <h2>3️⃣ Argo CD Overview</h2>
+
+  <p>
+    Argo CD is a Kubernetes-native GitOps controller.
+  </p>
+
+  <ul>
+    <li>Runs inside the cluster</li>
+    <li>Continuously monitors Git</li>
+    <li>Syncs manifests automatically</li>
+    <li>Provides UI, CLI, and API</li>
+  </ul>
+
+  <pre>
+Argo CD Components
+ ├── API Server
+ ├── Repository Server
+ ├── Application Controller
+ └── Web UI
+  </pre>
+
+  <hr />
+
+  <h2>4️⃣ Installing Argo CD on AKS</h2>
+
+  <pre>
+kubectl create namespace argocd
+
+kubectl apply -n argocd \
+  -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+  </pre>
+
+  <p>
+    Argo CD runs as Pods inside the cluster.
+  </p>
+
+  <hr />
+
+  <h2>5️⃣ Argo CD Application (Core Concept)</h2>
+
+  <p>
+    An Argo CD Application defines:
+  </p>
+
+  <ul>
+    <li>Where the Git repo is</li>
+    <li>Which path contains manifests</li>
+    <li>Which cluster & namespace to deploy to</li>
+  </ul>
+
+  <pre>
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: my-app
+spec:
+  source:
+    repoURL: https://github.com/org/repo.git
+    path: manifests
+    targetRevision: main
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: production
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+  </pre>
+
+  <hr />
+
+  <h2>6️⃣ Automated Sync & Drift Detection</h2>
+
+  <p>
+    Argo CD continuously compares:
+  </p>
+
+  <ul>
+    <li>Desired state (Git)</li>
+    <li>Live state (Cluster)</li>
+  </ul>
+
+  <pre>
+If Git ≠ Cluster
+ → Argo CD reconciles
+  </pre>
+
+  <p>
+    This eliminates configuration drift permanently.
+  </p>
+
+  <hr />
+
+  <h2>7️⃣ GitOps vs CI/CD (Key Difference)</h2>
+
+  <pre>
+CI/CD:
+Pipeline → kubectl apply → Cluster
+
+GitOps:
+Pipeline → Git
+Argo CD → Cluster
+  </pre>
+
+  <p>
+    CI builds artifacts.
+    GitOps deploys artifacts.
+  </p>
+
+  <hr />
+
+  <h2>8️⃣ Environment Promotion (Dev → Test → Prod)</h2>
+
+  <p>
+    Promotion happens via Git commits, not manual actions.
+  </p>
+
+  <pre>
+dev branch  → dev cluster
+test branch → test cluster
+main branch → prod cluster
+  </pre>
+
+  <p>
+    Rollback = Git revert.
+  </p>
+
+  <hr />
+
+  <h2>9️⃣ GitOps with Helm</h2>
+
+  <p>
+    Argo CD natively supports Helm charts.
+  </p>
+
+  <pre>
+spec:
+  source:
+    repoURL: https://github.com/org/charts.git
+    chart: myapp
+    targetRevision: 1.2.3
+    helm:
+      values: |
+        replicaCount: 3
+  </pre>
+
+  <p>
+    This combines Helm templating with GitOps governance.
+  </p>
+
+  <hr />
+
+  <h2>🔟 Real Production Project Example</h2>
+
+  <p>
+    A SaaS company uses:
+  </p>
+
+  <ul>
+    <li>GitHub for source</li>
+    <li>GitHub Actions for CI</li>
+    <li>Argo CD for CD</li>
+    <li>AKS for runtime</li>
+  </ul>
+
+  <p>
+    Result:
+  </p>
+
+  <ul>
+    <li>Zero manual deployments</li>
+    <li>Instant rollbacks</li>
+    <li>Full audit trail</li>
+  </ul>
+
+  <hr />
+
+  <h2>1️⃣1️⃣ Security Best Practices</h2>
+
+  <ul>
+    <li>Read-only Git access for Argo CD</li>
+    <li>RBAC on Applications</li>
+    <li>Private repositories</li>
+    <li>Signed commits (optional)</li>
+  </ul>
+
+  <hr />
+
+  <h2>1️⃣2️⃣ Common GitOps Mistakes</h2>
+
+  <ul>
+    <li>Allowing kubectl apply in prod</li>
+    <li>Mixing imperative and declarative ops</li>
+    <li>Not enforcing branch protection</li>
+  </ul>
+
+  <hr />
+
+  <h2>🔍 Interview Self-Check</h2>
+
+  <p><b>Q:</b> What problem does GitOps solve?</p>
+  <p><b>A:</b> Configuration drift and unsafe deployments.</p>
+
+  <p><b>Q:</b> Who deploys in GitOps?</p>
+  <p><b>A:</b> The cluster (via Argo CD), not humans.</p>
+
+  <hr />
+
+  <h2>➡️ What Comes Next?</h2>
+
+  <p>
+    GitOps enables safety.
+    Now we study real-world failures and lessons learned.
+  </p>
+
+  <p style="color:#4da3ff;">
+    👉 Proceed to <b>Real AKS Incident Case Studies (Postmortems)</b>
+  </p>
+</section>

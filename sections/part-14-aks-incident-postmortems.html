@@ -1,0 +1,267 @@
+<section>
+  <h1 style="color:#f5c84c;">Real AKS Incident Case Studies (Postmortems)</h1>
+
+  <p>
+    Real DevOps mastery is not about avoiding failure.
+    It is about <b>understanding failure deeply</b> and designing systems that recover safely.
+  </p>
+
+  <p>
+    This section documents <b>real AKS failure scenarios</b>, their root causes,
+    and how experienced platform teams fix and prevent them.
+  </p>
+
+  <hr />
+
+  <h2>📉 Incident 1 – Node Pool Scale Failure (Production Outage)</h2>
+
+  <h3>🧠 Scenario</h3>
+  <p>
+    A production AKS cluster received a sudden traffic spike.
+    HPA scaled pods, but new pods stayed in <b>Pending</b> state.
+    Users experienced downtime.
+  </p>
+
+  <h3>🔍 Root Cause</h3>
+  <ul>
+    <li>Cluster Autoscaler was disabled</li>
+    <li>Node pool reached max node limit</li>
+    <li>No capacity for new pods</li>
+  </ul>
+
+  <h3>🧪 Evidence</h3>
+  <pre>
+kubectl get pods
+STATUS: Pending
+
+kubectl describe pod myapp
+Reason: Unschedulable
+  </pre>
+
+  <h3>✅ Fix</h3>
+  <pre>
+az aks nodepool update \
+  --cluster-name prod-aks \
+  --resource-group rg-prod \
+  --name systempool \
+  --enable-cluster-autoscaler \
+  --min-count 3 \
+  --max-count 10
+  </pre>
+
+  <h3>📘 Lesson Learned</h3>
+  <ul>
+    <li>HPA without Cluster Autoscaler is dangerous</li>
+    <li>Always test scale-out scenarios</li>
+  </ul>
+
+  <hr />
+
+  <h2>🔥 Incident 2 – Accidental kubectl delete in Production</h2>
+
+  <h3>🧠 Scenario</h3>
+  <p>
+    An engineer ran <code>kubectl delete deployment</code> in the wrong context.
+    Production traffic dropped instantly.
+  </p>
+
+  <h3>🔍 Root Cause</h3>
+  <ul>
+    <li>No GitOps enforcement</li>
+    <li>Cluster-admin permissions for humans</li>
+    <li>No RBAC separation</li>
+  </ul>
+
+  <h3>❌ What Went Wrong</h3>
+  <pre>
+kubectl config use-context prod
+kubectl delete deployment api-service
+  </pre>
+
+  <h3>✅ Fix (GitOps + RBAC)</h3>
+  <pre>
+# Humans: read-only access
+# Argo CD: deploy permissions
+  </pre>
+
+  <h3>📘 Lesson Learned</h3>
+  <p>
+    Humans should never deploy to production.
+    Git should.
+  </p>
+
+  <hr />
+
+  <h2>💥 Incident 3 – YAML Misconfiguration CrashLoopBackOff</h2>
+
+  <h3>🧠 Scenario</h3>
+  <p>
+    A ConfigMap change caused all pods to crash repeatedly.
+  </p>
+
+  <h3>🔍 Root Cause</h3>
+  <pre>
+env:
+  - name: DB_PORT
+    value: "not-a-number"
+  </pre>
+
+  <p>
+    Application expected an integer.
+  </p>
+
+  <h3>🧪 Symptoms</h3>
+  <pre>
+kubectl get pods
+STATUS: CrashLoopBackOff
+  </pre>
+
+  <h3>✅ Fix</h3>
+  <pre>
+env:
+  - name: DB_PORT
+    value: "5432"
+  </pre>
+
+  <h3>📘 Lesson Learned</h3>
+  <ul>
+    <li>YAML has no type safety</li>
+    <li>Validate configs before deploy</li>
+  </ul>
+
+  <hr />
+
+  <h2>🌐 Incident 4 – Ingress Misconfiguration (App Not Reachable)</h2>
+
+  <h3>🧠 Scenario</h3>
+  <p>
+    Application was healthy but unreachable from the internet.
+  </p>
+
+  <h3>🔍 Root Cause</h3>
+  <ul>
+    <li>Ingress controller installed</li>
+    <li>No Ingress resource created</li>
+  </ul>
+
+  <h3>❌ Missing YAML</h3>
+  <pre>
+# Ingress resource was missing
+  </pre>
+
+  <h3>✅ Fix</h3>
+  <pre>
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app-ingress
+spec:
+  rules:
+  - host: myapp.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: app-service
+            port:
+              number: 80
+  </pre>
+
+  <h3>📘 Lesson Learned</h3>
+  <p>
+    LoadBalancers expose services.
+    Ingress routes traffic.
+  </p>
+
+  <hr />
+
+  <h2>📊 Incident 5 – No Monitoring, Blind Failure</h2>
+
+  <h3>🧠 Scenario</h3>
+  <p>
+    Application slowed down gradually.
+    No alerts were triggered.
+    Users complained before engineers noticed.
+  </p>
+
+  <h3>🔍 Root Cause</h3>
+  <ul>
+    <li>No metrics alerts</li>
+    <li>No dashboards</li>
+  </ul>
+
+  <h3>✅ Fix</h3>
+  <ul>
+    <li>Enable Azure Monitor</li>
+    <li>Enable Container Insights</li>
+    <li>Set CPU/Memory alerts</li>
+  </ul>
+
+  <h3>📘 Lesson Learned</h3>
+  <p>
+    If you don’t measure it, you can’t protect it.
+  </p>
+
+  <hr />
+
+  <h2>🛡️ Incident 6 – Secrets Leaked in Git</h2>
+
+  <h3>🧠 Scenario</h3>
+  <p>
+    Database password was committed into GitHub.
+  </p>
+
+  <h3>❌ Bad YAML</h3>
+  <pre>
+env:
+  - name: DB_PASSWORD
+    value: mypassword123
+  </pre>
+
+  <h3>✅ Fix</h3>
+  <pre>
+kubectl create secret generic db-secret \
+  --from-literal=password=******
+  </pre>
+
+  <h3>📘 Lesson Learned</h3>
+  <p>
+    Secrets never belong in Git.
+  </p>
+
+  <hr />
+
+  <h2>🧠 Platform Engineering Takeaways</h2>
+
+  <ul>
+    <li>Failures are design feedback</li>
+    <li>Most outages are configuration, not code</li>
+    <li>Automation prevents human error</li>
+    <li>Observability is non-negotiable</li>
+  </ul>
+
+  <hr />
+
+  <h2>🎯 Interview & Real-World Questions</h2>
+
+  <p><b>Q:</b> What causes most Kubernetes outages?</p>
+  <p><b>A:</b> Misconfiguration and lack of automation.</p>
+
+  <p><b>Q:</b> How do you prevent accidental prod changes?</p>
+  <p><b>A:</b> GitOps + RBAC + branch protection.</p>
+
+  <hr />
+
+  <h2>➡️ What Comes Next?</h2>
+
+  <p>
+    Now that we understand failures,
+    we move into <b>resilience engineering</b> and production hardening.
+  </p>
+
+  <p style="color:#4da3ff;">
+    👉 Next: <b>AKS Backup, Disaster Recovery & High Availability</b>
+  </p>
+</section>
