@@ -99,7 +99,6 @@
     <a class="nav-link" onclick="loadSection('sections/part-15-incidents.html')">Incident Case Studies</a>
     <a class="nav-link" onclick="loadSection('sections/part-16-aks-cost-governance-maturity.html')">Cost & Governance</a>
     <a class="nav-link" onclick="loadSection('sections/part-17-internal-developer-platform-aks.html')">Internal Developer Platform</a>
-
   </aside>
 
   <main id="content">
@@ -116,18 +115,20 @@
   </main>
 
   <script>
+    const BASE_PATH = "/AKS/";
+
     async function loadSection(file) {
       try {
-        const res = await fetch(file);
-        if (!res.ok) throw new Error("Not found");
+        const res = await fetch(BASE_PATH + file);
+        if (!res.ok) throw new Error(res.status);
         document.getElementById("content").innerHTML = await res.text();
+        window.scrollTo(0, 0);
       } catch (e) {
         document.getElementById("content").innerHTML =
-          "<h2>⚠️ Section not found</h2><p>Check file name and server.</p>";
+          "<h2>⚠️ Section not found</h2><p>" + file + "</p><p>Error: " + e.message + "</p>";
       }
     }
   </script>
 
 </body>
 </html>
-
