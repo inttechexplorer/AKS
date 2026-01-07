@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Krishna’s Master Guide – Azure · DevOps · Kubernetes · Python</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #0f172a, #020617);
+      color: #e5e7eb;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    aside {
+      width: 260px;
+      background: linear-gradient(180deg, #020617, #020617);
+      border-right: 1px solid rgba(148,163,184,.2);
+      padding: 16px;
+      overflow-y: auto;
+    }
+
+    aside h2 {
+      color: #f5c84c;
+      font-size: 1.1rem;
+      margin-bottom: 14px;
+    }
+
+    .nav-link {
+      display: block;
+      padding: 8px 10px;
+      margin-bottom: 4px;
+      border-radius: 8px;
+      color: #e5e7eb;
+      text-decoration: none;
+      cursor: pointer;
+      font-size: .9rem;
+    }
+
+    .nav-link:hover {
+      background: rgba(59,130,246,.15);
+      color: #4da3ff;
+    }
+
+    main {
+      flex: 1;
+      padding: 24px;
+      overflow-y: auto;
+      background:
+        radial-gradient(circle at top right, rgba(37,99,235,.15), transparent 60%),
+        radial-gradient(circle at bottom left, rgba(245,158,11,.12), transparent 60%);
+    }
+
+    .placeholder {
+      max-width: 800px;
+      margin: auto;
+      text-align: center;
+      opacity: .9;
+    }
+
+    .placeholder h1 {
+      color: #f5c84c;
+      margin-bottom: 10px;
+    }
+
+    code, pre {
+      background: #020617;
+      color: #e5e7eb;
+      padding: 10px;
+      border-radius: 8px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+
+<body>
+
+  <aside>
+    <h2>📘 Master Guide</h2>
+
+    <a class="nav-link" onclick="loadSection('sections/part-01-azure.html')">Azure Fundamentals</a>
+    <a class="nav-link" onclick="loadSection('sections/part-02-kubernetes-core.html')">Kubernetes Core</a>
+    <a class="nav-link" onclick="loadSection('sections/part-03-kubernetes-networking.html')">Kubernetes Networking</a>
+    <a class="nav-link" onclick="loadSection('sections/part-04-kubernetes-scaling.html')">Kubernetes Scaling</a>
+    <a class="nav-link" onclick="loadSection('sections/part-05-yaml.html')">YAML Mastery</a>
+    <a class="nav-link" onclick="loadSection('sections/part-06-python-fundamentals.html')">Python Fundamentals</a>
+    <a class="nav-link" onclick="loadSection('sections/part-07-python-devops.html')">Python for DevOps</a>
+    <a class="nav-link" onclick="loadSection('sections/part-08-python-kubernetes.html')">Python for Kubernetes</a>
+    <a class="nav-link" onclick="loadSection('sections/part-09-sql.html')">SQL Complete Guide</a>
+    <a class="nav-link" onclick="loadSection('sections/part-10-helm.html')">Helm Charts</a>
+    <a class="nav-link" onclick="loadSection('sections/part-11-cicd.html')">CI/CD Pipelines</a>
+    <a class="nav-link" onclick="loadSection('sections/part-12-aks-architecture.html')">AKS Architecture</a>
+    <a class="nav-link" onclick="loadSection('sections/part-13-observability.html')">Observability</a>
+    <a class="nav-link" onclick="loadSection('sections/part-14-gitops.html')">GitOps</a>
+    <a class="nav-link" onclick="loadSection('sections/part-15-incidents.html')">Incident Case Studies</a>
+    <a href="sections/part-16-aks-cost-governance-maturity.html" target="content">Cost & Governance</a>
+    <a href="sections/part-17-internal-developer-platform-aks.html" target="content">Internal Developer Platform</a>
+  </aside>
+
+  <main id="content">
+    <div class="placeholder">
+      <h1>Jai Shri Krishna 🙏</h1>
+      <p>
+        This is a complete, open-source, phone-friendly master guide to
+        <b>Azure, DevOps, Kubernetes, YAML, Python & AKS</b>.
+      </p>
+      <p>
+        Select a topic from the left to begin your journey.
+      </p>
+    </div>
+  </main>
+
+  <script>
+    async function loadSection(file) {
+      try {
+        const res = await fetch(file);
+        if (!res.ok) throw new Error("Not found");
+        document.getElementById("content").innerHTML = await res.text();
+      } catch (e) {
+        document.getElementById("content").innerHTML =
+          "<h2>⚠️ Section not found</h2><p>Check file name and server.</p>";
+      }
+    }
+  </script>
+
+</body>
+</html>
